@@ -22,36 +22,35 @@
 #     code updates to fit updated workflow for generating stage-discharge rating curves
 ##############################################################################################
 
-## -- TO RUN THE CODE OUTSIDE OF A DOCKER CONTAINER, UNCOMMENT AND RUN LINES __ - __ -- ##
+## -- TO RUN THE CODE OUTSIDE OF A DOCKER CONTAINER, UNCOMMENT AND RUN LINES 31 - 47 -- ##
 # The paths can get pretty long (>260 characters), which can cause trouble with the data stacker in windows. Choose wisely.
 
 # User inputs for site and date
 # If you enter a startDate that is not YYYY-10-01, the script will determine the water year (10-01 - 09-30) that started immediately before the date entered here and use it as the startDate
 
-# Set global environment variables (see stageQCurve package readme for a description of each variable)
-Sys.setenv(DIRPATH = "C:/Users/nickerson/Documents/GitHub/NEON-stream-discharge/L4Discharge/",
-           BAMFOLD="BaM_beta/",
-           BAMFILE="BaM_MiniDMSL.exe",#Windows version
-           #BAMFILE="BaM_exe",#Linux version
-           DATAWS="C:/Users/nickerson/Documents/GitHub/NEON-stream-discharge/L4Discharge/data/",
-           BAMWS="BaM_beta/BaM_BaRatin/",
-           STARTDATE = "2016-10-01",
-           SITE = "COMO")
+# # Set global environment variables (see stageQCurve package readme for a description of each variable)
+# Sys.setenv(DIRPATH = "C:/Users/nickerson/Documents/GitHub/NEON-stream-discharge/L4Discharge/",
+#            BAMFOLD="BaM_beta/",
+#            BAMFILE="BaM_MiniDMSL.exe",#Windows version
+#            #BAMFILE="BaM_exe",#Linux version
+#            DATAWS="C:/Users/nickerson/Documents/GitHub/NEON-stream-discharge/L4Discharge/data/",
+#            BAMWS="BaM_beta/BaM_BaRatin/",
+#            STARTDATE = "2016-10-01",
+#            SITE = "COMO")
+# # Call global environment variables into local environment
+# DIRPATH = Sys.getenv("DIRPATH")
+# BAMFOLD = Sys.getenv("BAMFOLD")
+# BAMFILE = Sys.getenv("BAMFILE")
+# DATAWS = Sys.getenv("DATAWS")
+# BAMWS = Sys.getenv("BAMWS")
+# startDate = Sys.getenv("STARTDATE")
+# site = Sys.getenv("SITE")
 
-# Call global environment variables into local environment
-DIRPATH = Sys.getenv("DIRPATH")
-BAMFOLD = Sys.getenv("BAMFOLD")
-BAMFILE = Sys.getenv("BAMFILE")
-DATAWS = Sys.getenv("DATAWS")
-BAMWS = Sys.getenv("BAMWS")
-startDate = Sys.getenv("STARTDATE")
-site = Sys.getenv("SITE")
-
-# Need to run this periodically if you're running the code outside of the Docker container as NEON packages get updated
-library(devtools)
+# # Need to run this periodically if you're running the code outside of the Docker container as NEON packages get updated
+# library(devtools)
 # install_github("NEONScience/NEON-utilities/neonUtilities", force = TRUE, dependencies = TRUE)
 # install_github("NEONScience/NEON-stream-discharge/L4Discharge/stageQCurve", force = TRUE, dependencies = TRUE)
-# Load needed library for Docker testing prior to GitHub package release
+# # Load needed library for Docker testing prior to GitHub package release
 # setwd("/app/L4_discharge/")
 # devtools::install("stageQCurve")
 # library(stageQCurve)
@@ -62,12 +61,14 @@ Sys.setenv(TZ='UTC')
 library(neonUtilities)
 library(stageQCurve)
 
-# Run main function to create a rating curve
+### --- RUN MAIN FUNCTION TO GENERATE A RATING CURVE --- ###
+
 # The inputs are set as environment variables rather than R variables to allow for running the Docker container for diffrent sites and dates without rebuilding it
 # To run the function, a user must have data downloaded from the expanded download package of the Stage-discharge rating curves (DP4.00133.001) data product. Data must be saved in the DATAWS file path
 stageQCurve::calc.stag.Q.curv()
 
-# Plot rating curve prior and posterior parameter distributions
+### --- PLOT RATING CURVE PRIOR AND POSTERIOR PARAMETER DISTRIBUTIONS --- ###
+
 # 3 options for accessing data to plot
 
 # Option 1: From calc.stag.Q.curv outputs directly
@@ -96,7 +97,8 @@ stageQCurve::MCMC.sim.plot(numCtrls=numCtrls,
                            Results_MCMC_Cooked=Results_MCMC_Cooked,
                            NEONformat=F)
 
-# Run the BaM rating curve prediction model and plot the posterior rating curve
+### --- RUN THE BaM RATING CURVE PREDICTION MODEL AND PLOT THE POSTERIOR RATING CURVE --- ###
+
 # 3 options for accessing data to plot
 
 # Option 1: From calc.stag.Q.curv outputs directly
