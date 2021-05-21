@@ -28,23 +28,24 @@
 # User inputs for site and date
 # If you enter a startDate that is not YYYY-10-01, the script will determine the water year (10-01 - 09-30) that started immediately before the date entered here and use it as the startDate
 
-# # Set global environment variables (see stageQCurve package readme for a description of each variable)
-# Sys.setenv(DIRPATH = "C:/Users/nickerson/Documents/GitHub/NEON-stream-discharge/L4Discharge/",
-#            BAMFOLD="BaM_beta/",
-#            BAMFILE="BaM_MiniDMSL.exe",#Windows version
-#            #BAMFILE="BaM_exe",#Linux version
-#            DATAWS="C:/Users/nickerson/Documents/GitHub/NEON-stream-discharge/L4Discharge/data/",
-#            BAMWS="BaM_beta/BaM_BaRatin/",
-#            STARTDATE = "2016-10-01",
-#            SITE = "COMO")
-# # Call global environment variables into local environment
-# DIRPATH = Sys.getenv("DIRPATH")
-# BAMFOLD = Sys.getenv("BAMFOLD")
-# BAMFILE = Sys.getenv("BAMFILE")
-# DATAWS = Sys.getenv("DATAWS")
-# BAMWS = Sys.getenv("BAMWS")
-# startDate = Sys.getenv("STARTDATE")
-# site = Sys.getenv("SITE")
+# Set global environment variables (see stageQCurve package readme for a description of each variable)
+Sys.setenv(DIRPATH = "C:/Users/nickerson/Documents/GitHub/NEON-stream-discharge/L4Discharge/",
+           BAMFOLD="BaM_beta/",
+           BAMFILE="BaM_MiniDMSL.exe",#Windows version
+           #BAMFILE="BaM_exe",#Linux version
+           DATAWS="C:/Users/nickerson/Documents/stageQCurve_data/",
+           BAMWS="BaM_beta/BaM_BaRatin/",
+           STARTDATE = "2018-10-01",
+           SITE = "COMO")
+
+# Call global environment variables into local environment
+DIRPATH = Sys.getenv("DIRPATH")
+BAMFOLD = Sys.getenv("BAMFOLD")
+BAMFILE = Sys.getenv("BAMFILE")
+DATAWS = Sys.getenv("DATAWS")
+BAMWS = Sys.getenv("BAMWS")
+startDate = Sys.getenv("STARTDATE")
+site = Sys.getenv("SITE")
 
 # # Need to run this periodically if you're running the code outside of the Docker container as NEON packages get updated
 # library(devtools)
@@ -69,17 +70,12 @@ stageQCurve::calc.stag.Q.curv()
 
 ### --- PLOT RATING CURVE PRIOR AND POSTERIOR PARAMETER DISTRIBUTIONS --- ###
 
-# 3 options for accessing data to plot
-
-# Option 1: From calc.stag.Q.curv outputs directly
+# From calc.stag.Q.curv outputs directly
 numCtrls <- nrow(read.table(paste0(DIRPATH,BAMWS,"Config_ControlMatrix.txt")))
 priorParams <- read.table(paste0(DIRPATH,BAMWS,"Config_Model.txt"),header = F)
 Results_MCMC_Cooked <- read.table(paste0(DIRPATH,BAMWS,"Results_MCMC_Cooked.txt"),header = T)
 
-# Option 2: From downloaded NEON data
-# TBD
-
-# # Option 3: From NEON OS transition system download -- FOR NEON INTERNAL USE ONLY
+# # From NEON OS transition system download -- FOR NEON INTERNAL USE ONLY
 # posteriorParameter <- read.table(paste0(DATAWS,"L1_Results_sdrc_posteriorParameters_pub.txt", header = T))
 # resultsResiduals <- read.table(paste0(DATAWS,"L1_Results_sdrc_resultsResiduals_pub.txt", header = T))
 # sampledParameters <- read.table(paste0(DATAWS,"L1_Results_sdrc_sampledParameters_pub.txt", header = T))
@@ -99,16 +95,11 @@ stageQCurve::MCMC.sim.plot(numCtrls=numCtrls,
 
 ### --- RUN THE BaM RATING CURVE PREDICTION MODEL AND PLOT THE POSTERIOR RATING CURVE --- ###
 
-# 3 options for accessing data to plot
-
-# Option 1: From calc.stag.Q.curv outputs directly
+# From calc.stag.Q.curv outputs directly
 stageDischargeCurveInfo <- read.csv(paste0(DIRPATH,BAMWS,"stageDischargeCurveInfo.csv"),header = T)
 gaugeDischargeMeas <- read.csv(paste0(DIRPATH,BAMWS,"gaugeDischargeMeas.csv"),header = T)
 
-# Option 2: From downloaded NEON data
-# TBD
-
-# # Option 3: From NEON OS transition system download -- FOR NEON INTERNAL USE ONLY
+# # From NEON OS transition system download -- FOR NEON INTERNAL USE ONLY
 # stageDischargeCurveInfo <- read.table(paste0(DATAWS,"L1_Results_sdrc_stageDischargeCurveInfo_pub.txt", header = T))
 # gaugeDischargeMeas <- read.table(paste0(DATAWS,"L1_Results_sdrc_gaugeDischargeMeas_pub.txt", header = T))
 
