@@ -190,7 +190,7 @@ calc.stag.Q.curv <- function(DIRPATH = Sys.getenv("DIRPATH"),
   # Work only with the gauge and discharge records within this rating segment
   dischargeDataForCurve <- dischargeData[dischargeData$curveID%in%curveIDString,]
   dischargeDataForCurve$streamStage <- dischargeDataForCurve$gaugeHeight
-  dischargeDataForCurve$calcQ <- dischargeDataForCurve$streamDischarge
+  dischargeDataForCurve$finalDischarge <- dischargeDataForCurve$streamDischarge
   dischargeDataForCurve$eventID <- dischargeDataForCurve$gaugeEventID
 
   # Set the curve start and end date and get list of all gauge event IDs
@@ -360,8 +360,8 @@ calc.stag.Q.curv <- function(DIRPATH = Sys.getenv("DIRPATH"),
   #Doesn't need curve specific information, just start and end dates that match the water year
   print("Formatting gaugeDischargeMeas")
   gaugeDischargeMeas_outputDF <- stageQCurve::frmt.gaug.disc.mea.file(dataFrame = dischargeDataForCurve,
-                                                                         metadata = tran.metadata,
-                                                                         curveIDData = curveIdentification)
+                                                                      metadata = tran.metadata,
+                                                                      curveIDData = curveIdentification)
   write.csv(gaugeDischargeMeas_outputDF,paste0(DIRPATH,BAMWS,"gaugeDischargeMeas_",curveID,".csv"),row.names = FALSE)
 
   #Format results for transition object
