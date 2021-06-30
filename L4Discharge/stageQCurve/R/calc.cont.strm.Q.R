@@ -79,9 +79,9 @@ calc.cont.strm.Q <- function(DIRPATH = Sys.getenv("DIRPATH"),
   PredMasterName <- gsub(nameRegex,"",Config_BaM[11])
   ConfigPredictions <- readLines(paste0(DIRPATH,BAMWS,PredMasterName))[1:4]
   ConfigPredictions[1] <- gsub("[0-9] ","3 ",ConfigPredictions[1])
-  ConfigPredictions[2] <- gsub("'.*'","Config_Pred_Maxpost.txt",ConfigPredictions[2])
-  ConfigPredictions[3] <- gsub("'.*'","Config_Pred_hU.txt",ConfigPredictions[3])
-  ConfigPredictions[4] <- gsub("'.*'","Config_Pred_TotalU.txt",ConfigPredictions[4])
+  ConfigPredictions[2] <- gsub("'.*'","'Config_Pred_Maxpost.txt'",ConfigPredictions[2])
+  ConfigPredictions[3] <- gsub("'.*'","'Config_Pred_hU.txt'",ConfigPredictions[3])
+  ConfigPredictions[4] <- gsub("'.*'","'Config_Pred_TotalU.txt'",ConfigPredictions[4])
   writeLines(ConfigPredictions,paste0(DIRPATH,BAMWS,PredMasterName))
 
   # Parse BaM configuration files
@@ -105,6 +105,11 @@ calc.cont.strm.Q <- function(DIRPATH = Sys.getenv("DIRPATH"),
   year <- format(searchIntervalStartDate,format="%Y")
   month <- format(searchIntervalStartDate,format="%m")
   downloadedDataPath <- DATAWS
+  if (Sys.getenv("SITE")%in%c("BLWA","TOMB","FLNT","TOOK")) {
+    mod <- "bat"
+  }else{
+    mod <- "geo"
+  }
 
   # Get continuous discharge data from the OS system
   # If data has been downloaded using neonUtilities::zipsByProduct() and saved to DATAWS
@@ -115,7 +120,7 @@ calc.cont.strm.Q <- function(DIRPATH = Sys.getenv("DIRPATH"),
     }
     continuousData  <- try(read.csv(paste(downloadedDataPath,"filesToStack00130","stackedFiles","csd_continuousDischarge.csv", sep = "/")),silent = T)
     gaugePressureData <- try(read.csv(paste(downloadedDataPath,"filesToStack00130","stackedFiles","sdrc_gaugePressureRelationship.csv", sep = "/")),silent = T)
-    regressionData <- try(read.csv(paste(downloadedDataPath,"filesToStack00130","stackedFiles","geo_gaugeWaterColumnRegression.csv", sep = "/")),silent = T)
+    regressionData <- try(read.csv(paste(downloadedDataPath,"filesToStack00130","stackedFiles",paste0(mod,"_gaugeWaterColumnRegression.csv"), sep = "/")),silent = T)
   }else{
     # If data has been directly downloaded from the NEON data portal and saved to DATAWS
     if(file.exists(paste0(downloadedDataPath,"NEON_discharge-continuous.zip"))|
@@ -126,13 +131,13 @@ calc.cont.strm.Q <- function(DIRPATH = Sys.getenv("DIRPATH"),
       }
       continuousData  <- try(read.csv(paste(downloadedDataPath,"NEON_discharge-continuous","stackedFiles","csd_continuousDischarge.csv", sep = "/")),silent = T)
       gaugePressureData <- try(read.csv(paste(downloadedDataPath,"NEON_discharge-continuous","stackedFiles","sdrc_gaugePressureRelationship.csv", sep = "/")),silent = T)
-      regressionData <- try(read.csv(paste(downloadedDataPath,"NEON_discharge-continuous","stackedFiles","geo_gaugeWaterColumnRegression.csv", sep = "/")),silent = T)
+      regressionData <- try(read.csv(paste(downloadedDataPath,"NEON_discharge-continuous","stackedFiles",paste0(mod,"_gaugeWaterColumnRegression.csv"), sep = "/")),silent = T)
     }else{
       # If the individual files are available in DATAWS
       availableFiles <- list.files(downloadedDataPath)
       continuousData  <- suppressWarnings(try(read.csv(paste(downloadedDataPath,availableFiles[grepl("csd_continuousDischarge",availableFiles)], sep = "/")),silent = T))
       gaugePressureData  <- suppressWarnings(try(read.csv(paste(downloadedDataPath,availableFiles[grepl("sdrc_gaugePressureRelationship",availableFiles)], sep = "/")),silent = T))
-      regressionData  <- suppressWarnings(try(read.csv(paste(downloadedDataPath,availableFiles[grepl("geo_gaugeWaterColumnRegression",availableFiles)], sep = "/")),silent = T))
+      regressionData  <- suppressWarnings(try(read.csv(paste(downloadedDataPath,availableFiles[grepl(paste0(mod,"_gaugeWaterColumnRegression"),availableFiles)], sep = "/")),silent = T))
     }
   }
 
@@ -251,7 +256,7 @@ calc.cont.strm.Q <- function(DIRPATH = Sys.getenv("DIRPATH"),
       neonUtilities::stackByTable(paste0(downloadedDataPath,"filesToStack00133"))
     }
     dischargeData  <- try(read.csv(paste(downloadedDataPath,"filesToStack00133","stackedFiles","sdrc_gaugeDischargeMeas.csv", sep = "/")),silent = T)
-    curveIdentification <- try(read.csv(paste(downloadedDataPath,"filesToStack00133","stackedFiles","geo_curveIdentification.csv", sep = "/")),silent = T)
+    curveIdentification <- try(read.csv(paste(downloadedDataPath,"filesToStack00133","stackedFiles",paste0(mod,"_curveIdentification.csv"), sep = "/")),silent = T)
     spagData <- try(read.csv(paste(downloadedDataPath,"filesToStack00133","stackedFiles","sdrc_sampledParameters.csv", sep = "/")),silent = T)
   }else{
     # If data has been directly downloaded from the NEON data portal and saved to DATAWS
@@ -262,13 +267,13 @@ calc.cont.strm.Q <- function(DIRPATH = Sys.getenv("DIRPATH"),
         neonUtilities::stackByTable(paste0(downloadedDataPath,"NEON_discharge-rating-curves.zip"))
       }
       dischargeData  <- try(read.csv(paste(downloadedDataPath,"NEON_discharge-rating-curves","stackedFiles","sdrc_gaugeDischargeMeas.csv", sep = "/")),silent = T)
-      curveIdentification <- try(read.csv(paste(downloadedDataPath,"NEON_discharge-rating-curves","stackedFiles","geo_curveIdentification.csv", sep = "/")),silent = T)
+      curveIdentification <- try(read.csv(paste(downloadedDataPath,"NEON_discharge-rating-curves","stackedFiles",paste0(mod,"_curveIdentification.csv"), sep = "/")),silent = T)
       spagData <- try(read.csv(paste(downloadedDataPath,"NEON_discharge-rating-curves","stackedFiles","sdrc_sampledParameters.csv", sep = "/")),silent = T)
     }else{
       # If the individual files are available in DATAWS
       availableFiles <- list.files(downloadedDataPath)
       dischargeData  <- suppressWarnings(try(read.csv(paste(downloadedDataPath,availableFiles[grepl("sdrc_gaugeDischargeMeas",availableFiles)], sep = "/")),silent = T))
-      curveIdentification  <- suppressWarnings(try(read.csv(paste(downloadedDataPath,availableFiles[grepl("geo_curveIdentification",availableFiles)], sep = "/")),silent = T))
+      curveIdentification  <- suppressWarnings(try(read.csv(paste(downloadedDataPath,availableFiles[grepl(paste0(mod,"_curveIdentification"),availableFiles)], sep = "/")),silent = T))
       spagData  <- suppressWarnings(try(read.csv(paste(downloadedDataPath,availableFiles[grepl("sdrc_sampledParameters",availableFiles)], sep = "/")),silent = T))
     }
   }

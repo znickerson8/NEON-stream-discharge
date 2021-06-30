@@ -14,7 +14,7 @@
 #' files that are saved contain output data from the BaM executable that contain information
 #' on the modelled stage-discharge rating curve. The .CSV files that are save are formatted
 #' identically to the data tables available for download from the NEON Data Portal
-#' DP4.00133.001 or DP4.00130.001. When DPID = DP4.00133.001, the .PDF files that are saved 
+#' DP4.00133.001 or DP4.00130.001. When DPID = DP4.00133.001, the .PDF files that are saved
 #' are visuals of model parameter comparisons and the posterior stage-discharge rating curve.
 
 #' @references
@@ -41,25 +41,25 @@
 # For DPID = DP4.00133.001, if you enter a startDate that is not YYYY-10-01, the script will determine the water year (10-01 - 09-30) that started immediately before the date entered here and use it as the startDate
 # For DPID = DP4.00130.001, the function can only run a month of data through the BaM predictive model; therefore, whatever date you enter, it will model the entire month (e.g, enter 2018-01-17, the function will model all of 2018-01)
 
-# # Set global environment variables (see stageQCurve package readme for a description of each variable)
-# Sys.setenv(DIRPATH = "C:/Users/nickerson/Documents/GitHub/NEON-stream-discharge/L4Discharge/",
-#            BAMFOLD="BaM_beta/",
-#            BAMFILE="BaM_MiniDMSL.exe",#Windows version
-#            #BAMFILE="BaM_exe",#Linux version
-#            DATAWS="C:/Users/nickerson/Documents/stageQCurve_data/",
-#            BAMWS="BaM_beta/BaM_BaRatin/",
-#            STARTDATE = "2014-06-01",
-#            DPID = "DP4.00130.001",
-#            SITE = "WLOU")
-# # Call global environment variables into local environment
-# DIRPATH = Sys.getenv("DIRPATH")
-# BAMFOLD = Sys.getenv("BAMFOLD")
-# BAMFILE = Sys.getenv("BAMFILE")
-# DATAWS = Sys.getenv("DATAWS")
-# BAMWS = Sys.getenv("BAMWS")
-# startDate = Sys.getenv("STARTDATE")
-# DPID = Sys.getenv("DPID")
-# site = Sys.getenv("SITE")
+# Set global environment variables (see stageQCurve package readme for a description of each variable)
+Sys.setenv(DIRPATH = "C:/Users/nickerson/Documents/GitHub/NEON-stream-discharge/L4Discharge/",
+           BAMFOLD="BaM_beta/",
+           BAMFILE="BaM_MiniDMSL.exe",#Windows version
+           #BAMFILE="BaM_exe",#Linux version
+           DATAWS="C:/Users/nickerson/Documents/stageQCurve_data/",
+           BAMWS="BaM_beta/BaM_BaRatin/",
+           STARTDATE = "2018-11-01",
+           DPID = "DP4.00133.001",
+           SITE = "FLNT")
+# Call global environment variables into local environment
+DIRPATH = Sys.getenv("DIRPATH")
+BAMFOLD = Sys.getenv("BAMFOLD")
+BAMFILE = Sys.getenv("BAMFILE")
+DATAWS = Sys.getenv("DATAWS")
+BAMWS = Sys.getenv("BAMWS")
+startDate = Sys.getenv("STARTDATE")
+DPID = Sys.getenv("DPID")
+site = Sys.getenv("SITE")
 
 # # Need to run this periodically if you're running the code outside of the Docker container as NEON packages get updated
 # library(devtools)
@@ -80,6 +80,12 @@ library(stageQCurve)
 l4DischargeDPID <- "DP4.00133.001"
 l4ContinuousDPID <- "DP4.00130.001"
 
+if (Sys.getenv("SITE")%in%c("BLWA","TOMB","FLNT","TOOK")) {
+  mod <- "bat"
+}else{
+  mod <- "geo"
+}
+
 if(DPID == l4DischargeDPID){
   ### --- RUN MAIN FUNCTION TO GENERATE A RATING CURVE --- ###
   # We will split rating curve segments before proceeding with the remaining script
@@ -89,7 +95,7 @@ if(DPID == l4DischargeDPID){
     if (!file.exists(paste0(Sys.getenv("DATAWS"),"filesToStack00133/stackedFiles"))) {
       neonUtilities::stackByTable(paste0(Sys.getenv("DATAWS"),"filesToStack00133"))
     }
-    curveIdentification <- try(read.csv(paste(Sys.getenv("DATAWS"),"filesToStack00133","stackedFiles","geo_curveIdentification.csv", sep = "/")),silent = T)
+    curveIdentification <- try(read.csv(paste(Sys.getenv("DATAWS"),"filesToStack00133","stackedFiles",paste0(mod,"_curveIdentification.csv"), sep = "/")),silent = T)
   }else{
     # If data has been directly downloaded from the NEON data portal and saved to DATAWS
     if(file.exists(paste0(Sys.getenv("DATAWS"),"NEON_discharge-rating-curves.zip"))|
@@ -98,11 +104,11 @@ if(DPID == l4DischargeDPID){
       if(file.exists(paste0(Sys.getenv("DATAWS"),"NEON_discharge-rating-curves.zip"))){
         neonUtilities::stackByTable(paste0(Sys.getenv("DATAWS"),"NEON_discharge-rating-curves.zip"))
       }
-      curveIdentification <- try(read.csv(paste(Sys.getenv("DATAWS"),"NEON_discharge-rating-curves","stackedFiles","geo_curveIdentification.csv", sep = "/")),silent = T)
+      curveIdentification <- try(read.csv(paste(Sys.getenv("DATAWS"),"NEON_discharge-rating-curves","stackedFiles",paste0(mod,"_curveIdentification.csv"), sep = "/")),silent = T)
     }else{
       # If the individual files are available in DATAWS
       availableFiles <- list.files(Sys.getenv("DATAWS"))
-      curveIdentification  <- suppressWarnings(try(read.csv(paste(Sys.getenv("DATAWS"),availableFiles[grepl("geo_curveIdentification",availableFiles)], sep = "/")),silent = T))
+      curveIdentification  <- suppressWarnings(try(read.csv(paste(Sys.getenv("DATAWS"),availableFiles[grepl(paste0(mod,"_curveIdentification"),availableFiles)], sep = "/")),silent = T))
     }
   }
   # Error handling if no discharge or curve identification data can be found
