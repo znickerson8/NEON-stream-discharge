@@ -75,35 +75,38 @@ BaM.RC.out.plot <- function(
   names(priorBottom_seg1) <- c("Hgrid","Q")
   priorForPlotting_seg1 <- rbind(priorTop_seg1,priorBottom_seg1[dim(priorBottom_seg1)[1]:1,])
 
-  # ############################################################
-  # rcNam <- c('curveID','Hgrid','maxPostQ','pramUTop','pramUBottom','totalUTop','totalUBottom')
-  # rcData <- data.frame(matrix(data=NA, ncol=length(rcNam), nrow=181))
-  # names(rcData) <- rcNam
-  # rcData <- rcData
-  # rcData$curveID <- curveID
-  # rcData$Hgrid <- Hgrid_seg1
-  # rcData$maxPostQ <- Qrc_Maxpost_spag_seg1$V1*1000
-  # rcData$pramUTop <- pramUForPlottingTop_seg1$Q*1000
-  # rcData$pramUBottom <- pramUForPlottingBottom_seg1$Q*1000
-  # rcData$totalUTop <- totalUTop_seg1$Q*1000
-  # rcData$totalUBottom <- totalUBottom_seg1$Q*1000
-  # # rcData_allWYs <- rcData
+  ############################################################
+  ### Create .rds file to add rc plot data into shiny app ####
+  ############################################################
+  rcNam <- c('curveID','Hgrid','maxPostQ','pramUTop','pramUBottom','totalUTop','totalUBottom')
+  rcData <- data.frame(matrix(data=NA, ncol=length(rcNam), nrow=181))
+  names(rcData) <- rcNam
+  rcData <- rcData
+  rcData$curveID <- curveID
+  rcData$Hgrid <- Hgrid_seg1
+  rcData$maxPostQ <- Qrc_Maxpost_spag_seg1$V1*1000
+  rcData$pramUTop <- pramUForPlottingTop_seg1$Q*1000
+  rcData$pramUBottom <- pramUForPlottingBottom_seg1$Q*1000
+  rcData$totalUTop <- totalUTop_seg1$Q*1000
+  rcData$totalUBottom <- totalUBottom_seg1$Q*1000
+  rcData_allWYs <- rcData
+  #
   # rcData_allWYs <- rbind(rcData_allWYs,rcData)
-  # rcGaugings <- gaugings_seg1
-  # rcGaugings$curveID <- curveID
-  # # rcGaugings_allWYs <- rcGaugings
+  rcGaugings <- gaugings_seg1
+  rcGaugings$curveID <- curveID
+  rcGaugings_allWYs <- rcGaugings
   # rcGaugings_allWYs <- rbind(rcGaugings_allWYs,rcGaugings)
-  # #
-  # rcDataAndGaugings <- list(
-  #   rcData_allWYs,
-  #   rcGaugings_allWYs
-  # )
-  # names(rcDataAndGaugings) <- c(
-  #   "rcData",
-  #   "rcGaugings"
-  # )
-  # saveRDS(rcDataAndGaugings,"C:/Users/nickerson/Documents/Github/NEON-stream-discharge-divine/L4Discharge/AOSApp/rcPlottingData.rds")
-  # #############################################################
+  #
+  rcDataAndGaugings <- list(
+    rcData_allWYs,
+    rcGaugings_allWYs
+  )
+  names(rcDataAndGaugings) <- c(
+    "rcData",
+    "rcGaugings"
+  )
+  saveRDS(rcDataAndGaugings,paste0("C:/Users/nickerson/Box/L4-Discharge-Development-And-Testing/rcDataStashForShinyApp/rcPlottingData_",curveID,".rds"))
+  #############################################################
   
   ### ----- THE CODE BELOW IS FOR A 2ND SEGMENT OF A RATING CURVE ----- ###
 
@@ -261,9 +264,9 @@ BaM.RC.out.plot <- function(
       # add_trace(x=gaugings_seg3$H,y=gaugings_seg3$Q,name='Empirial H/Q Pairs 3',type='scatter',mode='markers',marker=list(color='black'),legendgroup='group6')%>%
 
       ### ----- BELOW ARE AESTHETICS FOR ALL PLOTS ----- ###
-      # # Min/Max Calc H
-      # add_segments(x=minCalcH,xend=minCalcH,y=0,yend=max(totalUForPlotting_seg1$Q)*1000,name='Min Calc Q',showlegend=F,line=list(color='black',dash='dash'))%>%
-      # add_segments(x=maxCalcH,xend=maxCalcH,y=0,yend=max(totalUForPlotting_seg1$Q)*1000,name='Max Calc Q',showlegend=F,line=list(color='black',dash='dash'))%>%
+      # Min/Max Calc H
+      add_segments(x=minCalcH,xend=minCalcH,y=0,yend=max(totalUForPlotting_seg1$Q)*1000,name='Min Calc Q',showlegend=F,line=list(color='black',dash='dash'))%>%
+      add_segments(x=maxCalcH,xend=maxCalcH,y=0,yend=max(totalUForPlotting_seg1$Q)*1000,name='Max Calc Q',showlegend=F,line=list(color='black',dash='dash'))%>%
       #Plot Layout
       layout(title=paste0(gsub("-[1-3]{1}","",unique(sampledParameters$curveID))," -- Rating Curve w/ Uncertainty -- Linear"),
         xaxis=list(title="Stage (m)"),

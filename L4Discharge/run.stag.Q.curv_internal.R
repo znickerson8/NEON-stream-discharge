@@ -39,14 +39,14 @@
 # If you enter a startDate that is not YYYY-10-01, the script will determine the water year (10-01 - 09-30) that started immediately before the date entered here and use it as the startDate
 
 # Set global environment variables (see stageQCurve package readme for a description of each variable)
-Sys.setenv(DIRPATH = "C:/Users/nickerson/Documents/GitHub/NEON-stream-discharge/L4Discharge/",
+Sys.setenv(DIRPATH = "C:/Users/nickerson/Documents/GitHub/NEON-stream-discharge-zlnfork/L4Discharge/",
            BAMFOLD="BaM_beta/",
            BAMFILE="BaM_MiniDMSL.exe",#Windows version
            #BAMFILE="BaM_exe",#Linux version
            DATAWS="C:/Users/nickerson/Documents/stageQCurve_data/",
            BAMWS="BaM_beta/BaM_BaRatin/",
-           STARTDATE = "2017-10-01",
-           SITE = "PRIN")
+           STARTDATE = "2019-10-01",
+           SITE = "COMO")
 # Call global environment variables into local environment
 DIRPATH = Sys.getenv("DIRPATH")
 BAMFOLD = Sys.getenv("BAMFOLD")
@@ -129,14 +129,14 @@ library(stageQCurve)
   # Results_MCMC_Cooked <- read.table(paste0(DIRPATH,BAMWS,"Results_MCMC_Cooked.txt"),header = T)
 
   # From NEON OS transition system download -- FOR NEON INTERNAL USE ONLY
-  curveID <- "PRIN.2018-2"
+  curveID <- "COMO.2020"
   posteriorParameter <- read.table(paste0(DATAWS,"L1_Results_sdrc_posteriorParameters_pub.txt"), header = T)
   posteriorParameter <- posteriorParameter[posteriorParameter$curveID==curveID,]
   resultsResiduals <- read.table(paste0(DATAWS,"L1_Results_sdrc_resultsResiduals_pub.txt"), header = T)
   resultsResiduals <- resultsResiduals[resultsResiduals$curveID==curveID,]
   sampledParameters <- read.table(paste0(DATAWS,"L1_Results_sdrc_sampledParameters_pub.txt"), header = T)
   sampledParameters <- sampledParameters[sampledParameters$curveID==curveID,]
-  stageQInternal::txt.out.spag.data(spagDataIn=sampledParameters, spagOutPath=paste0(DIRPATH, BAMWS, "Results_MCMC_Cooked.txt"))
+  stageQCurve::txt.out.spag.data(spagDataIn=sampledParameters, spagOutPath=paste0(DIRPATH, BAMWS, "Results_MCMC_Cooked.txt"))
   numCtrls <- nrow(posteriorParameter)
   priorParams <- read.table(paste0(DIRPATH,BAMWS,"Config_Model.txt"),header = F)
   Results_MCMC_Cooked <- read.table(paste0(DIRPATH,BAMWS,"Results_MCMC_Cooked.txt"),header = T)
@@ -169,8 +169,8 @@ library(stageQCurve)
   # maxH <- 0.6
   # minH <- stageDischargeCurveInfo$minStage - abs(stageDischargeCurveInfo$minStage)
   # maxH <- stageDischargeCurveInfo$maxStage + stageDischargeCurveInfo$maxStage*0.3
-  minCalcH <- -0.0305192515910703
-  maxCalcH <- 1.33166103856914
+  minCalcH <- 0.223560339633457
+  maxCalcH <- 0.874744997199384
   minH <- minCalcH - abs(minCalcH)
   maxH <- maxCalcH + minCalcH*0.3
   Hgrid_seg1 <- stageQCurve::BaM.run.pred.RC(gaugingsData = gaugeDischargeMeas,
