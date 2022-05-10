@@ -46,7 +46,7 @@ Sys.setenv(DIRPATH = "C:/Users/nickerson/Documents/GitHub/NEON-stream-discharge-
            DATAWS="C:/Users/nickerson/Documents/stageQCurve_data/",
            BAMWS="BaM_beta/BaM_BaRatin/",
            STARTDATE = "2020-10-01",
-           SITE = "TECR")
+           SITE = "OKSR")
 # Call global environment variables into local environment
 DIRPATH = Sys.getenv("DIRPATH")
 BAMFOLD = Sys.getenv("BAMFOLD")
@@ -129,7 +129,7 @@ library(stageQCurve)
   # Results_MCMC_Cooked <- read.table(paste0(DIRPATH,BAMWS,"Results_MCMC_Cooked.txt"),header = T)
 
   # From NEON OS transition system download -- FOR NEON INTERNAL USE ONLY
-  curveID <- "TECR.2021"
+  curveID <- paste0(site,".2021")
   posteriorParameter <- read.table(paste0(DATAWS,"L1_Results_sdrc_posteriorParameters_pub.txt"), header = T)
   posteriorParameter <- posteriorParameter[posteriorParameter$curveID==curveID,]
   resultsResiduals <- read.table(paste0(DATAWS,"L1_Results_sdrc_resultsResiduals_pub.txt"), header = T)
@@ -167,18 +167,18 @@ library(stageQCurve)
   #Run BaM in prediction mode to get the information for the rating curve
   # minH <- 0
   # maxH <- 0.6
-  minH <- stageDischargeCurveInfo$minStage - abs(stageDischargeCurveInfo$minStage)
-  maxH <- stageDischargeCurveInfo$maxStage + stageDischargeCurveInfo$maxStage*0.3
-  # minCalcH <- 0.348755736590591
-  # maxCalcH <- 2.81296353327976
-  # minH <- minCalcH - abs(minCalcH)
-  # maxH <- maxCalcH + minCalcH*0.3
+  # minH <- stageDischargeCurveInfo$minStage - abs(stageDischargeCurveInfo$minStage)
+  # maxH <- stageDischargeCurveInfo$maxStage + stageDischargeCurveInfo$maxStage*0.3
+  minCalcH <- 0.688434353384568
+  maxCalcH <- 1.57164638143143
+  minH <- minCalcH - abs(minCalcH)
+  maxH <- maxCalcH + minCalcH*0.3
   Hgrid_seg1 <- stageQCurve::BaM.run.pred.RC(gaugingsData = gaugeDischargeMeas,
                                         minH = minH,
                                         maxH = maxH)
-  # Hgrid_seg2 <- stageQCurve::BaM.run.pred.RC(gaugingsData = gaugeDischargeMeas,
-  #                                       minH = minH,
-  #                                       maxH = maxH)
+  Hgrid_seg2 <- stageQCurve::BaM.run.pred.RC(gaugingsData = gaugeDischargeMeas,
+                                        minH = minH,
+                                        maxH = maxH)
 
   # #Plot and save figures of BaM rating curve prediction run
   # stageQCurve::BaM.RC.out.plot(curveID=curveID,

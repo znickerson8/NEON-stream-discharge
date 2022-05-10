@@ -105,80 +105,80 @@ BaM.RC.out.plot <- function(
     "rcData",
     "rcGaugings"
   )
-  saveRDS(rcDataAndGaugings,paste0("C:/Users/nickerson/Box/L4-Discharge-Development-And-Testing/rcDataStashForShinyApp/rcPlottingData_",curveID,".rds"))
+  saveRDS(rcDataAndGaugings,paste0("C:/Users/nickerson/Box/L4-Discharge-Development-And-Testing/zzz - rcDataStashForShinyApp/rcPlottingData_",curveID,".rds"))
   #############################################################
   
   ### ----- THE CODE BELOW IS FOR A 2ND SEGMENT OF A RATING CURVE ----- ###
 
-  # ## -- Read in output data of the rating curve MCMC predictions
-  # # Predicted Priors
-  # Qrc_Prior_spag_seg2 <- read.table(paste0(DIRPATH, BAMWS, "Qrc_Prior.spag"), header = F)
-  # Qrc_Prior_env_seg2 <- read.table(paste0(DIRPATH, BAMWS, "Qrc_Prior.env"), header = T)
-  # # Predicted Max Post Discharge
-  # Qrc_Maxpost_spag_seg2 <- read.table(paste0(DIRPATH, BAMWS, "Qrc_Maxpost.spag"), header = F)
-  # # Predicted Parametric Uncertainty
-  # Qrc_ParamU_spag_seg2 <- read.table(paste0(DIRPATH, BAMWS, "Qrc_ParamU.spag"), header = F)
-  # Qrc_ParamU_env_seg2 <- read.table(paste0(DIRPATH, BAMWS, "Qrc_ParamU.env"), header = T)
-  # # Predicted Remnant Uncertainty
-  # Qrc_TotalU_spag_seg2 <- read.table(paste0(DIRPATH, BAMWS, "Qrc_TotalU.spag"), header = F)
-  # Qrc_TotalU_env_seg2 <- read.table(paste0(DIRPATH, BAMWS, "Qrc_TotalU.env"), header = T)
-  # # Empirial Gauge and Discharge Pairs
-  # gaugings_seg2 <- read.table(paste0(DIRPATH, BAMWS, "data/Gaugings.txt"),sep = "\t",header = T)
-  # gaugings_seg2$Q <- as.numeric(gaugings_seg2$Q) #Convert to cms from lps
-  # gaugings_seg2$uQ <- as.numeric(gaugings_seg2$uQ) #Convert to cms from lps
-  # 
-  # ## -- Get Parameters for plotting
-  # # Parametric Uncertainty Parameters for Plotting
-  # pramUForPlottingTop_seg2 <- cbind.data.frame(Hgrid_seg2,Qrc_ParamU_env_seg2$Q_q2.5)
-  # pramUForPlottingBottom_seg2 <- cbind.data.frame(Hgrid_seg2,Qrc_ParamU_env_seg2$Q_q97.5)
-  # names(pramUForPlottingTop_seg2) <- c("Hgrid","Q")
-  # names(pramUForPlottingBottom_seg2) <- c("Hgrid","Q")
-  # pramUForPlotting_seg2 <- rbind(pramUForPlottingTop_seg2,pramUForPlottingBottom_seg2[dim(pramUForPlottingBottom_seg2)[1]:1,])
-  # # Remnant Uncertainty Parameters for Plotting
-  # totalUTop_seg2 <- cbind.data.frame(Hgrid_seg2,Qrc_TotalU_env_seg2$Q_q2.5)
-  # totalUBottom_seg2 <- cbind.data.frame(Hgrid_seg2,Qrc_TotalU_env_seg2$Q_q97.5)
-  # names(totalUTop_seg2) <- c("Hgrid","Q")
-  # names(totalUBottom_seg2) <- c("Hgrid","Q")
-  # totalUForPlotting_seg2 <- rbind(totalUTop_seg2,totalUBottom_seg2[dim(totalUBottom_seg2)[1]:1,])
-  # # Prior Uncertainty Parameters for Plotting
-  # priorTop_seg2 <- cbind.data.frame(Hgrid_seg2, Qrc_Prior_env_seg2$Q_q2.5)
-  # priorBottom_seg2 <- cbind.data.frame(Hgrid_seg2, Qrc_Prior_env_seg2$Q_q97.5)
-  # names(priorTop_seg2) <- c("Hgrid","Q")
-  # names(priorBottom_seg2) <- c("Hgrid","Q")
-  # priorForPlotting_seg2 <- rbind(priorTop_seg2,priorBottom_seg2[dim(priorBottom_seg2)[1]:1,])
-  # 
-  # ############################################################
-  # ### Create .rds file to add rc plot data into shiny app ####
-  # ############################################################
-  # rcNam <- c('curveID','Hgrid','maxPostQ','pramUTop','pramUBottom','totalUTop','totalUBottom')
-  # rcData <- data.frame(matrix(data=NA, ncol=length(rcNam), nrow=181))
-  # names(rcData) <- rcNam
-  # rcData <- rcData
-  # rcData$curveID <- curveID
-  # rcData$Hgrid <- Hgrid_seg2
-  # rcData$maxPostQ <- Qrc_Maxpost_spag_seg2$V1*1000
-  # rcData$pramUTop <- pramUForPlottingTop_seg2$Q*1000
-  # rcData$pramUBottom <- pramUForPlottingBottom_seg2$Q*1000
-  # rcData$totalUTop <- totalUTop_seg2$Q*1000
-  # rcData$totalUBottom <- totalUBottom_seg2$Q*1000
-  # rcData_allWYs <- rcData
-  # #
-  # # rcData_allWYs <- rbind(rcData_allWYs,rcData)
-  # rcGaugings <- gaugings_seg2
-  # rcGaugings$curveID <- curveID
-  # rcGaugings_allWYs <- rcGaugings
-  # # rcGaugings_allWYs <- rbind(rcGaugings_allWYs,rcGaugings)
-  # #
-  # rcDataAndGaugings <- list(
-  #   rcData_allWYs,
-  #   rcGaugings_allWYs
-  # )
-  # names(rcDataAndGaugings) <- c(
-  #   "rcData",
-  #   "rcGaugings"
-  # )
-  # saveRDS(rcDataAndGaugings,paste0("C:/Users/nickerson/Box/L4-Discharge-Development-And-Testing/rcDataStashForShinyApp/rcPlottingData_",curveID,".rds"))
-  # #############################################################
+  ## -- Read in output data of the rating curve MCMC predictions
+  # Predicted Priors
+  Qrc_Prior_spag_seg2 <- read.table(paste0(DIRPATH, BAMWS, "Qrc_Prior.spag"), header = F)
+  Qrc_Prior_env_seg2 <- read.table(paste0(DIRPATH, BAMWS, "Qrc_Prior.env"), header = T)
+  # Predicted Max Post Discharge
+  Qrc_Maxpost_spag_seg2 <- read.table(paste0(DIRPATH, BAMWS, "Qrc_Maxpost.spag"), header = F)
+  # Predicted Parametric Uncertainty
+  Qrc_ParamU_spag_seg2 <- read.table(paste0(DIRPATH, BAMWS, "Qrc_ParamU.spag"), header = F)
+  Qrc_ParamU_env_seg2 <- read.table(paste0(DIRPATH, BAMWS, "Qrc_ParamU.env"), header = T)
+  # Predicted Remnant Uncertainty
+  Qrc_TotalU_spag_seg2 <- read.table(paste0(DIRPATH, BAMWS, "Qrc_TotalU.spag"), header = F)
+  Qrc_TotalU_env_seg2 <- read.table(paste0(DIRPATH, BAMWS, "Qrc_TotalU.env"), header = T)
+  # Empirial Gauge and Discharge Pairs
+  gaugings_seg2 <- read.table(paste0(DIRPATH, BAMWS, "data/Gaugings.txt"),sep = "\t",header = T)
+  gaugings_seg2$Q <- as.numeric(gaugings_seg2$Q) #Convert to cms from lps
+  gaugings_seg2$uQ <- as.numeric(gaugings_seg2$uQ) #Convert to cms from lps
+
+  ## -- Get Parameters for plotting
+  # Parametric Uncertainty Parameters for Plotting
+  pramUForPlottingTop_seg2 <- cbind.data.frame(Hgrid_seg2,Qrc_ParamU_env_seg2$Q_q2.5)
+  pramUForPlottingBottom_seg2 <- cbind.data.frame(Hgrid_seg2,Qrc_ParamU_env_seg2$Q_q97.5)
+  names(pramUForPlottingTop_seg2) <- c("Hgrid","Q")
+  names(pramUForPlottingBottom_seg2) <- c("Hgrid","Q")
+  pramUForPlotting_seg2 <- rbind(pramUForPlottingTop_seg2,pramUForPlottingBottom_seg2[dim(pramUForPlottingBottom_seg2)[1]:1,])
+  # Remnant Uncertainty Parameters for Plotting
+  totalUTop_seg2 <- cbind.data.frame(Hgrid_seg2,Qrc_TotalU_env_seg2$Q_q2.5)
+  totalUBottom_seg2 <- cbind.data.frame(Hgrid_seg2,Qrc_TotalU_env_seg2$Q_q97.5)
+  names(totalUTop_seg2) <- c("Hgrid","Q")
+  names(totalUBottom_seg2) <- c("Hgrid","Q")
+  totalUForPlotting_seg2 <- rbind(totalUTop_seg2,totalUBottom_seg2[dim(totalUBottom_seg2)[1]:1,])
+  # Prior Uncertainty Parameters for Plotting
+  priorTop_seg2 <- cbind.data.frame(Hgrid_seg2, Qrc_Prior_env_seg2$Q_q2.5)
+  priorBottom_seg2 <- cbind.data.frame(Hgrid_seg2, Qrc_Prior_env_seg2$Q_q97.5)
+  names(priorTop_seg2) <- c("Hgrid","Q")
+  names(priorBottom_seg2) <- c("Hgrid","Q")
+  priorForPlotting_seg2 <- rbind(priorTop_seg2,priorBottom_seg2[dim(priorBottom_seg2)[1]:1,])
+
+  ############################################################
+  ### Create .rds file to add rc plot data into shiny app ####
+  ############################################################
+  rcNam <- c('curveID','Hgrid','maxPostQ','pramUTop','pramUBottom','totalUTop','totalUBottom')
+  rcData <- data.frame(matrix(data=NA, ncol=length(rcNam), nrow=181))
+  names(rcData) <- rcNam
+  rcData <- rcData
+  rcData$curveID <- curveID
+  rcData$Hgrid <- Hgrid_seg2
+  rcData$maxPostQ <- Qrc_Maxpost_spag_seg2$V1*1000
+  rcData$pramUTop <- pramUForPlottingTop_seg2$Q*1000
+  rcData$pramUBottom <- pramUForPlottingBottom_seg2$Q*1000
+  rcData$totalUTop <- totalUTop_seg2$Q*1000
+  rcData$totalUBottom <- totalUBottom_seg2$Q*1000
+  rcData_allWYs <- rcData
+  #
+  # rcData_allWYs <- rbind(rcData_allWYs,rcData)
+  rcGaugings <- gaugings_seg2
+  rcGaugings$curveID <- curveID
+  rcGaugings_allWYs <- rcGaugings
+  # rcGaugings_allWYs <- rbind(rcGaugings_allWYs,rcGaugings)
+  #
+  rcDataAndGaugings <- list(
+    rcData_allWYs,
+    rcGaugings_allWYs
+  )
+  names(rcDataAndGaugings) <- c(
+    "rcData",
+    "rcGaugings"
+  )
+  saveRDS(rcDataAndGaugings,paste0("C:/Users/nickerson/Box/L4-Discharge-Development-And-Testing/zzz - rcDataStashForShinyApp/rcPlottingData_",curveID,".rds"))
+  #############################################################
   
   ### ----- THE CODE BELOW IS FOR A 3RD SEGMENT OF A RATING CURVE ----- ###
 
