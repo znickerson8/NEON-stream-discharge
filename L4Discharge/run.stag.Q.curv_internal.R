@@ -46,7 +46,7 @@ Sys.setenv(DIRPATH = "C:/Users/nickerson/Documents/GitHub/NEON-stream-discharge-
            DATAWS="C:/Users/nickerson/Documents/stageQCurve_data/",
            BAMWS="BaM_beta/BaM_BaRatin/",
            STARTDATE = "2020-10-01",
-           SITE = "OKSR")
+           SITE = "MAYF")
 # Call global environment variables into local environment
 DIRPATH = Sys.getenv("DIRPATH")
 BAMFOLD = Sys.getenv("BAMFOLD")
@@ -169,8 +169,8 @@ library(stageQCurve)
   # maxH <- 0.6
   # minH <- stageDischargeCurveInfo$minStage - abs(stageDischargeCurveInfo$minStage)
   # maxH <- stageDischargeCurveInfo$maxStage + stageDischargeCurveInfo$maxStage*0.3
-  minCalcH <- 0.688434353384568
-  maxCalcH <- 1.57164638143143
+  minCalcH <- 0.301358139438515
+  maxCalcH <- 0.973131237511124
   minH <- minCalcH - abs(minCalcH)
   maxH <- maxCalcH + minCalcH*0.3
   Hgrid_seg1 <- stageQCurve::BaM.run.pred.RC(gaugingsData = gaugeDischargeMeas,

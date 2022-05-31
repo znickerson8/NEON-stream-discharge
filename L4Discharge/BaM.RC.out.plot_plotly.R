@@ -297,9 +297,9 @@ BaM.RC.out.plot <- function(
       # add_trace(x=gaugings_seg3$H,y=gaugings_seg3$Q,name='Empirial H/Q Pairs 3',type='scatter',mode='markers',marker=list(color='black'),legendgroup='group6')%>%
 
       ### ----- BELOW ARE AESTHETICS FOR ALL PLOTS ----- ###
-      # # Min/Max Calc H
-      # add_segments(x=minCalcH,xend=minCalcH,y=0,yend=max(totalUForPlotting_seg1$Q)*1000,name='Min Calc Q',showlegend=F,line=list(color='black',dash='dash'))%>%
-      # add_segments(x=maxCalcH,xend=maxCalcH,y=0,yend=max(totalUForPlotting_seg1$Q)*1000,name='Max Calc Q',showlegend=F,line=list(color='black',dash='dash'))%>%
+      # Min/Max Calc H
+      add_segments(x=minCalcH,xend=minCalcH,y=0,yend=max(totalUForPlotting_seg1$Q)*1000,name='Min Calc Q',showlegend=F,line=list(color='black',dash='dash'))%>%
+      add_segments(x=maxCalcH,xend=maxCalcH,y=0,yend=max(totalUForPlotting_seg1$Q)*1000,name='Max Calc Q',showlegend=F,line=list(color='black',dash='dash'))%>%
       #Plot Layout
       layout(title=paste0(gsub("-[1-3]{1}","",unique(sampledParameters$curveID))," -- Rating Curve w/ Uncertainty -- Linear"),
         xaxis=list(title="Stage (m)"),
