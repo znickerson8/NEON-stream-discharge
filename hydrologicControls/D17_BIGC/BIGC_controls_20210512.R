@@ -1,12 +1,12 @@
 ######################################################################################################################## 
-#' @title Stage-Discharge Rating Curve Controls Script - D08 - BLWA
+#' @title Stage-Discharge Rating Curve Controls Script - D17 - BIGC
 
 #' @author Bobby Hensley \email{hensley@battelleecology.org} \cr 
 #' Kaelin M. Cawley \email{kcawley@battelleecology.org} \cr
 #' Nick Harrison \email{nharrison@battelleecology.org} \cr
 
 #' @description This script generates the controls, uncertainties, and priors associated with the creation of a stage-
-#' discharge rating curve for Black Warrior River for water years 2016-
+#' discharge rating curve for Big Creek for water years 2020-.
 
 #' @return This script produces three .csv files:
 #' 'geo_controlInfo_in' contains information on the number of controls and their activations
@@ -19,58 +19,55 @@
 # changelog and author contributions / copyrights
 #   Kaelin Cawley and Nick Harrison (2019)
 #     Generic script created
-#   Bobby Hensley (8/3/2020)
-#     Modified for BLWA 2020 survey
-########################################################################################################################
+#   Bobby Hensley (9/21/2021)
+#     Modified for BIGC 2021 survey
+######################################################################################################################## 
 
 #This reads in data using the API and pulls zip files from the ECS buckets
 #load packages
 library(neonUtilities)
 library(plotly)
 
-siteID <- "BLWA"
-domainID <- "D08"
+siteID <- "BIGC"
+domainID <- "D17"
 streamMorphoDPID <- "DP4.00131.001"
-filepath <- "N:/Science/AQU/Controls/D08_BLWA_20200127"
+filepath <- "N:/Science/AQU/Controls/D17_BIGC_20210512"
 URIpath <- paste(filepath,"filesToStack00131","stackedFiles",sep = "/")
 
-# #Download data from CERT using restR
-# L0pull_site <- restR::get.os.l0.by.namedLocation(
-#   pullType = "startDate",
-#   stack = "cert",
-#   tab = 'DP0.00131.001:geo_AISsiteSurveyResultsFile_in',
-#   minDate = '2019-01-01',
-#   maxDate = '2021-01-01',
-#   namedLocationName = 'BLWA')
-# download.file(L0pull_site$rawDataFilePath,L0pull_site$rawDataFileName,mode="wb")
-# unzip(paste0("~/",L0pull_site$rawDataFileName),exdir="~")
-# surveyPtsDF <- read.table("~/D08_BLWA_surveyPts_20200127.csv",
-#                           sep = ",",
-#                           header = T,
-#                           stringsAsFactors = F,
-#                           encoding = "UTF-8")
-
-# Read from loacl csv
-surveyPtsDF <- read.csv(file="D08_BLWA_surveyPts_20200127.csv")
-
+# Download data from CERT using restR
+L0pull_site <- restR::get.os.l0.by.namedLocation(
+  pullType = "startDate",
+  stack = "cert",
+  tab = 'DP0.00131.001:geo_AISsiteSurveyResultsFile_in',
+  minDate = '2021-05-01',
+  maxDate = '2021-06-01',
+  namedLocationName = 'BIGC')
+download.file(L0pull_site$rawDataFilePath,L0pull_site$rawDataFileName,mode="wb")
+unzip(paste0("~/",L0pull_site$rawDataFileName),exdir="~")
+surveyPtsDF <- read.table("~/D17_BIGC_surveyPts_20210512.csv",
+                          sep = ",",
+                          header = T,
+                          stringsAsFactors = F,
+                          encoding = "UTF-8")
 
 #The end date of the geomorphology survey (YYYYMMDD)
-surveyDate<-'20200127'
+surveyDate<-'20210512' 
 
 #The date when this survey applies to the gauging record
-surveyActiveDate <- "2012-01-01" #1/1/2012 is used for the first survey for a site out of convenience
+surveyActiveDate <- "2019-10-01" 
 
 #Stipulate 4-digit site code, underscore, and survey year (ex: HOPB_2017)
-surveyID <- "BLWA_2020"
+surveyID <- "BIGC_2021" 
 
-#Creates dataframe of all points associated with transect
-dischargePointsXS1<-subset(surveyPtsDF,mapCode=="Transect")
+#Creates dataframe of all points associated with transect DSC.
+names(surveyPtsDF) <- c("name","E","N","H","mapCode","X")
+dischargePointsXS1<-subset(surveyPtsDF,mapCode=="Transect_DSC")
 dischargePointsXS1<-dischargePointsXS1[order(dischargePointsXS1$N),]
 rownames(dischargePointsXS1)<-seq(length=nrow(dischargePointsXS1))
 
 #Sets plot1 settings.  
 xAxisTitle1<-list(title="Easting (m)",zeroline=FALSE)
-yAxisTitle1<-list(title="Northing (m)",zeroline=FALSE)
+yAxisTitle1<-list(title="Northing  (m)",zeroline=FALSE)
 font<-list(size=12,color='black')
 
 #Plot the cross section by easting and northing data for a sanity check
@@ -78,29 +75,8 @@ plot_ly(data=dischargePointsXS1,x=~E, y=~N, name='Easting vs Northing', type='sc
   layout(title = siteID, xaxis=xAxisTitle1, yaxis=yAxisTitle1)
 
 #Manually select NorthStart and EastStart coordinates
-dischargeXS1NorthStart<-dischargePointsXS1$N[dischargePointsXS1$name=="LFPLN_11"]
-dischargeXS1EastStart<-dischargePointsXS1$E[dischargePointsXS1$name=="LFPLN_11"]
-
-# Manually adds channel points
-leftWeir<-data.frame("L_height_of_zero_flow",83.4,171.3,96.8,"Transect")
-names(leftWeir)<-c("name","N","E","H","mapCode")
-leftChannel<-data.frame("L_channel_bottom",83.4,171.3,90.4,"Transect")
-names(leftChannel)<-c("name","N","E","H","mapCode")
-rightWeir<-data.frame("R_height_of_zero_flow",27.7,47.65,96.8,"Transect")
-names(rightWeir)<-c("name","N","E","H","mapCode")
-rightChannel<-data.frame("R_channel_bottom",27.7,47.65,90.4,"Transect")
-names(rightChannel)<-c("name","N","E","H","mapCode")
-rightFloodplain<-data.frame("R_floodplain",-20,-90,99,"Transect")
-names(rightFloodplain)<-c("name","N","E","H","mapCode")
-dischargePointsXS1<-rbind(dischargePointsXS1,leftWeir)
-dischargePointsXS1<-rbind(dischargePointsXS1,leftChannel)
-dischargePointsXS1<-rbind(dischargePointsXS1,rightChannel)
-dischargePointsXS1<-rbind(dischargePointsXS1,rightWeir)
-dischargePointsXS1<-rbind(dischargePointsXS1,rightFloodplain)
-
-#RePlot the cross section by easting and northing data with channel added
-plot_ly(data=dischargePointsXS1,x=~E, y=~N, name='Easting vs Northing', type='scatter', mode='markers', text=~name)%>%
-  layout(title = siteID, xaxis=xAxisTitle1, yaxis=yAxisTitle1)
+dischargeXS1NorthStart<-dischargePointsXS1$N[dischargePointsXS1$name=="DSC_XS"]
+dischargeXS1EastStart<-dischargePointsXS1$E[dischargePointsXS1$name=="DSC_XS"]
 
 #Assigns a raw Distance value to each point relative to the NorthStart and EastStart coordinates.
 for(i in 1:(length(dischargePointsXS1$name))){
@@ -110,29 +86,29 @@ for(i in 1:(length(dischargePointsXS1$name))){
 }
 
 #To manually select ReferenceDistance:
-dischargeXS1ReferenceDistance <- dischargePointsXS1$DistanceRaw[dischargePointsXS1$name=="LFPLN_11"]
+dischargeXS1ReferenceDistance <- dischargePointsXS1$DistanceRaw[dischargePointsXS1$name=="DSC_XS"]
 
 #Sets Horizontal adjustment value based on reference point coordinate.  
-dischargeXS1HorizontalAdjust <- 0-dischargeXS1ReferenceDistance
+dischargeXS1HorizontalAdjust<-0-dischargeXS1ReferenceDistance
 
 #Transforms raw distance to adjusted distance based on reference distance point.
 for(i in 1:(length(dischargePointsXS1$name))){
   dischargePointsXS1$DistanceAdj[i]<-dischargePointsXS1$DistanceRaw[i]+dischargeXS1HorizontalAdjust
 }
 
-# #Calculates the bankfull width
-# DSCXS1Bankfull<-abs((dischargePointsXS1$DistanceAdj[grepl("RBF",dischargePointsXS1$name)])-
-#                       (dischargePointsXS1$DistanceAdj[grepl("LBF",dischargePointsXS1$name)]))
+#Calculates the bankfull width
+#DSCXS1Bankfull<-abs((dischargePointsXS1$DistanceAdj[grepl("RBF",dischargePointsXS1$name)])-
+#                     (dischargePointsXS1$DistanceAdj[grepl("LBF",dischargePointsXS1$name)]))
 
 #Creates dataframe of staff gauge points
-staffGaugePoints=subset(surveyPtsDF,surveyPtsDF$mapCode=="Gauge")
+staffGaugePoints=subset(surveyPtsDF,surveyPtsDF$name=="SP_0.690M")
 staffGaugePoints<-staffGaugePoints[order(staffGaugePoints$N),]
 rownames(staffGaugePoints)<-seq(length=nrow(staffGaugePoints))
 
 #Set meter mark where the staff gauge was shot in and the name of the staff gauge point:
 #Recorded in field data
-staffGaugeMeterMark <- 2.90
-staffGaugeElevation <- staffGaugePoints$H[grepl("SP_2.9",staffGaugePoints$name)]  
+staffGaugeMeterMark<-0.69
+staffGaugeElevation <- staffGaugePoints$H 
 
 #Converts discharge XS1 transect point elevations to gauge height (rounded to 2 digits).
 dischargePointsXS1$gaugeHeight<-dischargePointsXS1$H - (staffGaugeElevation - staffGaugeMeterMark)
@@ -144,7 +120,7 @@ dischargePointsXS1$ID<-c(1:length(dischargePointsXS1$name))
 dischargePointsXS1 <- dischargePointsXS1[order(dischargePointsXS1$DistanceAdj),]
 
 #Sets plot2 settings.  
-xAxisTitle2<-list(title="Distance (m)",zeroline=FALSE, range=c(-5,350))
+xAxisTitle2<-list(title="Distance (m)",zeroline=FALSE, range=c(-20,5))
 yAxisTitle2<-list(title="Gauge Height  (m)",zeroline=FALSE)
 font<-list(size=12,color='black')
 
@@ -152,6 +128,31 @@ font<-list(size=12,color='black')
 plot_ly(data=dischargePointsXS1,x=~DistanceAdj, y=~gaugeHeight, name='Distance vs. Gauge Height', type='scatter', mode='markers+lines', text=~name)%>%
   add_trace(y= 0,name = 'Gauge Height = 0.00m',mode='lines',line = list(color = 'red', width = 2, dash='dash')) %>%
   layout(title = siteID, xaxis=xAxisTitle2, yaxis=yAxisTitle2)
+
+#####################################################################################################################################################
+#Adjusts the cross section elevations so lowest point is equal to 0.00 meter mark of staff gauge
+#####################################################################################################################################################
+#Determines the lowest elevation of the discharge cross-section
+dischargeXSmin<-min(dischargePointsXS1$H)
+
+#Determines elevation of 0.00 meter mark of staff gage
+staffGaugeZero=staffGaugeElevation-staffGaugeMeterMark
+
+#Determines the offset between the lowest elevation and gauge height 
+ElevOff<-dischargeXSmin-staffGaugeZero
+
+#Adjusts the cross section elevations by the offset and rounds to 2 decimals
+dischargePointsXS1$gaugeHeight<-dischargePointsXS1$gaugeHeight - ElevOff
+dischargePointsXS1$gaugeHeight<-round(dischargePointsXS1$gaugeHeight,digits=2)
+
+#Replots the adjusted cross section  
+xAxisTitle2<-list(title="Distance (m)",zeroline=FALSE, range=c(-20,30))
+yAxisTitle2<-list(title="Gauge Height  (m)",zeroline=FALSE)
+font<-list(size=12,color='black')
+plot_ly(data=dischargePointsXS1,x=~DistanceAdj, y=~gaugeHeight, name='Distance vs. Gauge Height', type='scatter', mode='markers+lines', text=~name)%>%
+  add_trace(y= 0,name = 'Gauge Height = 0.00m',mode='lines',line = list(color = 'red', width = 2, dash='dash')) %>%
+  layout(title = siteID, xaxis=xAxisTitle2, yaxis=yAxisTitle2)
+#####################################################################################################################################################
 
 ##### Now create the actual controls to upload... #####
 
@@ -162,7 +163,7 @@ geo_controlInfo_in <- data.frame(matrix(nrow = numControls*numControls, ncol = l
 names(geo_controlInfo_in) <- geo_controlInfo_in_names
 
 geo_controlInfo_in$locationID <- siteID
-geo_controlInfo_in$startDate <- surveyActiveDate
+geo_controlInfo_in$startDate <- surveyDate
 geo_controlInfo_in$endDate <- surveyActiveDate
 geo_controlInfo_in$controlNumber <- rep(1:numControls,numControls)
 geo_controlInfo_in <- geo_controlInfo_in[order(geo_controlInfo_in$controlNumber),]
@@ -182,31 +183,30 @@ geo_controlInfo_in$controlActivationState[geo_controlInfo_in$controlNumber==1&ge
 #Is control #2 still active when control #3 is activated? 0 = No
 geo_controlInfo_in$controlActivationState[geo_controlInfo_in$controlNumber==2&geo_controlInfo_in$segmentNumber==3] <- 1
 
-
 #Second, create entries for "geo_controlType_in" table for control parameters
 geo_controlType_in_names <- c("locationID",
-                              "startDate",
-                              "endDate",
-                              "controlNumber",
-                              "hydraulicControlType",
-                              "controlLeft",
-                              "controlRight",
-                              "rectangularWidth",
-                              "rectangularWidthUnc",
-                              "triangularAngle",
-                              "triangularAngleUnc",
-                              "parabolaWidth",
-                              "parabolaWidthUnc",
-                              "parabolaHeight",
-                              "parabolaHeightUnc",
-                              "orificeArea",
-                              "orificeAreaUnc",
-                              "channelSlope",
-                              "channelSlopeUnc",
-                              "manningCoefficient",
-                              "manningCoefficientUnc",
-                              "stricklerCoefficient",
-                              "stricklerCoefficientUnc")
+                               "startDate",
+                               "endDate",
+                               "controlNumber",
+                               "hydraulicControlType",
+                               "controlLeft",
+                               "controlRight",
+                               "rectangularWidth",
+                               "rectangularWidthUnc",
+                               "triangularAngle",
+                               "triangularAngleUnc",
+                               "parabolaWidth",
+                               "parabolaWidthUnc",
+                               "parabolaHeight",
+                               "parabolaHeightUnc",
+                               "orificeArea",
+                               "orificeAreaUnc",
+                               "channelSlope",
+                               "channelSlopeUnc",
+                               "manningCoefficient",
+                               "manningCoefficientUnc",
+                               "stricklerCoefficient",
+                               "stricklerCoefficientUnc")
 geo_controlType_in <- data.frame(matrix(nrow = numControls, ncol = length(geo_controlType_in_names)))
 names(geo_controlType_in) <- geo_controlType_in_names
 
@@ -217,47 +217,42 @@ geo_controlType_in$controlNumber <- 1:numControls
 
 #Entries for Control #1
 geo_controlType_in$hydraulicControlType[1] <- "Rectangular Weir"
-geo_controlType_in$controlLeft[1] <- dischargePointsXS1$DistanceAdj[dischargePointsXS1$name == "L_height_of_zero_flow"]
-geo_controlType_in$controlRight[1] <- dischargePointsXS1$DistanceAdj[dischargePointsXS1$name == "R_height_of_zero_flow"]
+geo_controlType_in$controlLeft[1] <- dischargePointsXS1$DistanceAdj[dischargePointsXS1$name == "DSC_LEW"]
+geo_controlType_in$controlRight[1] <- dischargePointsXS1$DistanceAdj[dischargePointsXS1$name == "DSC_REW"]
 geo_controlType_in$rectangularWidth[1] <- geo_controlType_in$controlRight[1]-geo_controlType_in$controlLeft[1]
-geo_controlType_in$rectangularWidthUnc[1] <- 20 #Higher than normal because used ADCP data
+geo_controlType_in$rectangularWidthUnc[1] <- 1.0 #Combined uncertainty associated with survey and where actual control begins (1.0 m default)
 
 #Entries for Control #2
 geo_controlType_in$hydraulicControlType[2] <- "Rectangular Channel"
-geo_controlType_in$controlLeft[2] <- dischargePointsXS1$DistanceAdj[dischargePointsXS1$name == "L_height_of_zero_flow"]
-geo_controlType_in$controlRight[2] <- dischargePointsXS1$DistanceAdj[dischargePointsXS1$name == "R_height_of_zero_flow"]
+geo_controlType_in$controlLeft[2] <- dischargePointsXS1$DistanceAdj[dischargePointsXS1$name == "DSC_LBF"]
+geo_controlType_in$controlRight[2] <- dischargePointsXS1$DistanceAdj[dischargePointsXS1$name == "DSC_RBF"]
 geo_controlType_in$rectangularWidth[2] <- geo_controlType_in$controlRight[2]-geo_controlType_in$controlLeft[2]
-geo_controlType_in$rectangularWidthUnc[2] <- 20 #Higher than normal because used ADCP data
+geo_controlType_in$rectangularWidthUnc[2] <- 1.0 #Combined uncertainty associated with survey and where actual control begins (1.0 m default)
 
 #Entries for Control #3
 geo_controlType_in$hydraulicControlType[3] <- "Rectangular Channel"
-geo_controlType_in$controlLeft[3] <- dischargePointsXS1$DistanceAdj[dischargePointsXS1$name == "R_height_of_zero_flow"]
-geo_controlType_in$controlRight[3] <- dischargePointsXS1$DistanceAdj[dischargePointsXS1$name == "R_floodplain"]
+geo_controlType_in$controlLeft[3] <- dischargePointsXS1$DistanceAdj[dischargePointsXS1$name == "DSC_RBF"]
+geo_controlType_in$controlRight[3] <- dischargePointsXS1$DistanceAdj[dischargePointsXS1$name == "DSC_XS23"]
 geo_controlType_in$rectangularWidth[3] <- geo_controlType_in$controlRight[3]-geo_controlType_in$controlLeft[3]
-geo_controlType_in$rectangularWidthUnc[3] <- 10 #Higher than normal because used ADCP data
+geo_controlType_in$rectangularWidthUnc[3] <- 1.0 #Combined uncertainty associated with survey and where actual control begins (1.0 m default)
 
 #Slope calculations
-waterEdge<-surveyPtsDF[(surveyPtsDF$name=="US_REW_1"|surveyPtsDF$name=="US_REW_2"),]
-
-rise <- waterEdge[1,4]-waterEdge[2,4]
-run <- sqrt(((waterEdge[1,2]-waterEdge[2,2])^2)+((waterEdge[1,3]-waterEdge[2,3])^2))
-
-geo_controlType_in$channelSlope[2] <- rise/run
-geo_controlType_in$channelSlopeUnc[2] <- 0.001
-geo_controlType_in$channelSlope[3] <- rise/run
-geo_controlType_in$channelSlopeUnc[3] <- 0.001
+# No shots to use for slope in survey. using slope from 2019 survey
+geo_controlType_in$channelSlope[2] <- 0.007
+geo_controlType_in$channelSlopeUnc[2] <- 0.010
+geo_controlType_in$channelSlope[3] <- 0.007
+geo_controlType_in$channelSlopeUnc[3] <- 0.010
 
 #chosen to represent stream conditions with higher roughness above bankfull
-geo_controlType_in$manningCoefficient[2] <- 0.05
-geo_controlType_in$manningCoefficientUnc[2] <- 0.0375
+geo_controlType_in$manningCoefficient[2] <- 0.05 # Cobble stream with some pools 
+geo_controlType_in$manningCoefficientUnc[2] <- 0.025 # Default Mannings uncertainty equal 50%
 geo_controlType_in$stricklerCoefficient[2] <- 1/geo_controlType_in$manningCoefficient[2]
 geo_controlType_in$stricklerCoefficientUnc[2] <- geo_controlType_in$stricklerCoefficient[2]*(geo_controlType_in$manningCoefficientUnc[2]/geo_controlType_in$manningCoefficient[2])
 
-geo_controlType_in$manningCoefficient[3] <- 0.1
-geo_controlType_in$manningCoefficientUnc[3] <- 0.075
+geo_controlType_in$manningCoefficient[3] <- 0.1 # Trees and some brush 
+geo_controlType_in$manningCoefficientUnc[3] <- 0.05 # Default Mannings uncertainty equal 50%
 geo_controlType_in$stricklerCoefficient[3] <- 1/geo_controlType_in$manningCoefficient[3]
 geo_controlType_in$stricklerCoefficientUnc[3] <- geo_controlType_in$stricklerCoefficient[3]*(geo_controlType_in$manningCoefficientUnc[3]/geo_controlType_in$manningCoefficient[3])
-
 
 #Third,  use equations to populate "geo_priorParameters_in" table
 geo_priorParameters_in <- data.frame(matrix(nrow = numControls, ncol = 10))
@@ -273,15 +268,14 @@ names(geo_priorParameters_in) <- c("locationID",
                                    "priorActivationStageUnc")
 
 #Manually enter activation stages for controls
-geo_priorParameters_in$priorActivationStage[1] <- dischargePointsXS1$gaugeHeight[dischargePointsXS1$name == "L_channel_bottom"]
-geo_priorParameters_in$priorActivationStageUnc[1] <- 1 
+geo_priorParameters_in$priorActivationStage[1] <- dischargePointsXS1$gaugeHeight[dischargePointsXS1$name == "DSC_XS11"]
+geo_priorParameters_in$priorActivationStageUnc[1] <- 0.1
 
-geo_priorParameters_in$priorActivationStage[2] <- dischargePointsXS1$gaugeHeight[dischargePointsXS1$name == "L_height_of_zero_flow"]
-geo_priorParameters_in$priorActivationStageUnc[2] <- 0.5 
+geo_priorParameters_in$priorActivationStage[2] <- dischargePointsXS1$gaugeHeight[dischargePointsXS1$name == "DSC_LEW"]
+geo_priorParameters_in$priorActivationStageUnc[2] <- 0.1
 
-geo_priorParameters_in$priorActivationStage[3] <- dischargePointsXS1$gaugeHeight[dischargePointsXS1$name == "R_floodplain"]
-geo_priorParameters_in$priorActivationStageUnc[3] <- 2 
-
+geo_priorParameters_in$priorActivationStage[3] <- dischargePointsXS1$gaugeHeight[dischargePointsXS1$name == "DSC_XS20"]
+geo_priorParameters_in$priorActivationStageUnc[3] <- 0.1
 
 geo_priorParameters_in$locationID <- siteID
 geo_priorParameters_in$startDate <- surveyActiveDate
