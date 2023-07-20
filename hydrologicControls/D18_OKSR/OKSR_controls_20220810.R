@@ -235,7 +235,7 @@ geo_priorParameters_in$priorActivationStage[2] <- dischargePointsXS1$gaugeHeight
 geo_priorParameters_in$priorActivationStageUnc[2] <- 0.1 # Combined uncertainty associated with survey and actual activation stage (0.1 m default)
 
 geo_priorParameters_in$priorActivationStage[3] <- dischargePointsXS1$gaugeHeight[dischargePointsXS1$name == "DSC_REW"]
-geo_priorParameters_in$priorActivationStageUnc[3] <- 1.0 # Added a bit more uncertainty here because there's not a clear sill at KING (until you get REALLY high)
+geo_priorParameters_in$priorActivationStageUnc[3] <- 0.1 # Combined uncertainty associated with survey and actual activation stage (0.1 m default)
 
 geo_priorParameters_in$locationID <- siteID
 geo_priorParameters_in$startDate <- surveyActiveDate
