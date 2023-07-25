@@ -48,9 +48,9 @@ Sys.setenv(DIRPATH = "C:/Users/nickerson/Documents/GitHub/NEON-stream-discharge/
            #BAMFILE="BaM_exe",#Linux version
            DATAWS="C:/Users/nickerson/Documents/stageQCurve_data/",
            BAMWS="BaM_beta/BaM_BaRatin/",
-           STARTDATE = "2018-11-01",
+           STARTDATE = "2021-11-01",
            DPID = "DP4.00133.001",
-           SITE = "TOOK")
+           SITE = "COMO")
 # Call global environment variables into local environment
 DIRPATH = Sys.getenv("DIRPATH")
 BAMFOLD = Sys.getenv("BAMFOLD")
@@ -147,15 +147,6 @@ if(DPID == l4DischargeDPID){
     priorParams <- read.table(paste0(Sys.getenv("DIRPATH"),Sys.getenv("BAMWS"),"Config_Model.txt"),header = F)
     Results_MCMC_Cooked <- read.table(paste0(Sys.getenv("DIRPATH"),Sys.getenv("BAMWS"),"Results_MCMC_Cooked.txt"),header = T)
 
-    # # From NEON OS transition system download -- FOR NEON INTERNAL USE ONLY
-    # posteriorParameter <- read.table(paste0(DATAWS,"L1_Results_sdrc_posteriorParameters_pub.txt", header = T))
-    # resultsResiduals <- read.table(paste0(DATAWS,"L1_Results_sdrc_resultsResiduals_pub.txt", header = T))
-    # sampledParameters <- read.table(paste0(DATAWS,"L1_Results_sdrc_sampledParameters_pub.txt", header = T))
-    # stageQCurve::txt.out.spag.data(spagDataIn=sampledParameters, spagOutPath=paste0(DIRPATH, BAMWS, "Results_MCMC_Cooked.txt"))
-    # numCtrls <- nrow(posteriorParameter)
-    # priorParams <- read.table(paste0(DIRPATH,BAMWS,"Config_Model.txt"),header = F)
-    # Results_MCMC_Cooked <- read.table(paste0(DIRPATH,BAMWS,"Results_MCMC_Cooked.txt"),header = T)
-
     # Run the functions to plot rating curve prior and posterior parameter distributions
     stageQCurve::pre.post.parm.plot(curveID=curveID,
                                     numCtrls=numCtrls,
@@ -172,10 +163,6 @@ if(DPID == l4DischargeDPID){
     # From calc.stag.Q.curv outputs directly
     stageDischargeCurveInfo <- read.csv(paste0(Sys.getenv("DIRPATH"),Sys.getenv("BAMWS"),"stageDischargeCurveInfo_",curveID,".csv"),header = T)
     gaugeDischargeMeas <- read.csv(paste0(Sys.getenv("DIRPATH"),Sys.getenv("BAMWS"),"gaugeDischargeMeas_",curveID,".csv"),header = T)
-
-    # # From NEON OS transition system download -- FOR NEON INTERNAL USE ONLY
-    # stageDischargeCurveInfo <- read.table(paste0(DATAWS,"L1_Results_sdrc_stageDischargeCurveInfo_pub.txt", header = T))
-    # gaugeDischargeMeas <- read.table(paste0(DATAWS,"L1_Results_sdrc_gaugeDischargeMeas_pub.txt", header = T))
 
     #Run BaM in prediction mode to get the information for the rating curve
     minH <- stageDischargeCurveInfo$minStage - abs(stageDischargeCurveInfo$minStage)
@@ -195,6 +182,13 @@ if(DPID == l4DischargeDPID){
       file.remove(paste0(Sys.getenv("DIRPATH"),Sys.getenv("BAMWS"),"data/Gaugings.txt"))
     }
   }
+  
+  ### --- RUN THE FUNCTION TO CREATE THE GAUGE HEIGHT - PRESSURE RELATIONSHIP TABLE FOR A WATER YEAR --- ###
+  
+  # The inputs are set as environment variables rather than R variables to allow for running the Docker container for diffrent sites and dates without rebuilding it
+  # To run the function, a user must have data downloaded from the expanded download package of 3 data products: 1) Continuous discharge (DP4.00130.001), 2) Discharge field collection (DP1.20048.001), 3) Gauge height (DP1.20267.001). Data must be saved in the DATAWS file path
+  stageQCurve::calc.gaug.press.rel.R()
+  
 }else if(DPID == l4ContinuousDPID){
   ### --- RUN MAIN FUNCTION TO GENERATE CONTINUOUS TIMESERIES DATA --- ###
   stageQCurve::calc.cont.strm.Q()
