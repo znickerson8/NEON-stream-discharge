@@ -6,7 +6,7 @@
 #' Nick Harrison \email{nharrison@battelleecology.org} \cr
 
 #' @description This script generates the controls, uncertainties, and priors associated with the creation of a stage-
-#' discharge rating curve for Posey Creek for water years 2017-2019.
+#' discharge rating curve for Posey Creek for water years 2018-.
 
 #' @return This script produces three .csv files:
 #' 'geo_controlInfo_in' contains information on the number of controls and their activations
@@ -21,6 +21,8 @@
 #     Generic script created
 #   Bobby Hensley (2/3/2020)
 #     Modified for POSE 2018 survey
+#   Bobby Hensley (8/14/2023)
+#     Modified to be public facing
 ######################################################################################################################## 
 
 #This reads in data using the API and pulls zip files from the ECS buckets
@@ -31,13 +33,13 @@ library(plotly)
 siteID <- "POSE"
 domainID <- "D02"
 streamMorphoDPID <- "DP4.00131.001"
-filepath <- "N:/Science/AQU/Controls/D02_POSE_20180221"
+filepath <- getwd()
 URIpath <- paste(filepath,"filesToStack00131","stackedFiles",sep = "/")
 
-# #Download data from API and store somewhere
-# dataFromAPI <- neonUtilities::zipsByProduct(streamMorphoDPID,siteID,package="expanded",check.size=FALSE,savepath = filepath)
-# neonUtilities::stackByTable(filepath=paste(filepath,"filesToStack00131",sep = "/"), folder = TRUE)
-# neonUtilities::zipsByURI(filepath=URIpath, savepath = URIpath, pick.files=FALSE, unzip = TRUE, check.size = FALSE)
+#Download data from API and store somewhere
+dataFromAPI <- neonUtilities::zipsByProduct(streamMorphoDPID,siteID,startdate="2017-01", enddate="2019-12",package="expanded",check.size=FALSE,savepath = filepath)
+neonUtilities::stackByTable(filepath=paste(filepath,"filesToStack00131",sep = "/"), folder = TRUE)
+neonUtilities::zipsByURI(filepath=URIpath, savepath = URIpath, pick.files=FALSE, unzip = TRUE, check.size = FALSE)
 
 #Read in downloaded data
 surveyPtsDF <- read.table(paste0(URIpath,"/NEON_D02_POSE_GEOMORPH_20180221_L0_VE/POSE_surveyPts_20180821.csv"),
@@ -123,9 +125,9 @@ plot_ly(data=dischargePointsXS1,x=~DistanceAdj, y=~gaugeHeight, name='Distance v
   add_trace(y= 0,name = 'Gauge Height = 0.00m',mode='lines',line = list(color = 'red', width = 2, dash='dash')) %>%
   layout(title = siteID, xaxis=xAxisTitle2, yaxis=yAxisTitle2)
 
-#####################################################################################################################################################
-#Adjusts the cross section elevations so lowest point is equal to 0.00 meter mark of staff gauge
-#####################################################################################################################################################
+#Adjusts the cross section so lowest point is equal to 0.00 m mark of staff gauge.
+#This may be necessary because DSC transects may not be exactly at gage, and
+#was recommended by BaM developers to avoid possible negative activation.
 #Determines the lowest elevation of the discharge cross-section
 dischargeXSmin<-min(dischargePointsXS1$H)
 
@@ -146,7 +148,6 @@ font<-list(size=12,color='black')
 plot_ly(data=dischargePointsXS1,x=~DistanceAdj, y=~gaugeHeight, name='Distance vs. Gauge Height', type='scatter', mode='markers+lines', text=~name)%>%
   add_trace(y= 0,name = 'Gauge Height = 0.00m',mode='lines',line = list(color = 'red', width = 2, dash='dash')) %>%
   layout(title = siteID, xaxis=xAxisTitle2, yaxis=yAxisTitle2)
-#####################################################################################################################################################
 
 ##### Now create the actual controls to upload... #####
 

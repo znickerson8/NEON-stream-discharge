@@ -21,6 +21,8 @@
 #     Generic script created
 #   Bobby Hensley (8/3/2020)
 #     Modified for FLNT 2018 survey
+#   Bobby Hensley (8/15/2023)
+#     Modified to be public facing
 ########################################################################################################################
 
 #This reads in data using the API and pulls zip files from the ECS buckets
@@ -31,7 +33,7 @@ library(plotly)
 siteID <- "FLNT"
 domainID <- "D03"
 streamMorphoDPID <- "DP4.00131.001"
-filepath <- "N:/Science/AQU/Controls/D03_FLNT_20180125"
+filepath <- getwd()
 URIpath <- paste(filepath,"filesToStack00131","stackedFiles",sep = "/")
 
 # #Download data from CERT using restR
@@ -50,6 +52,15 @@ surveyPtsDF <- read.table("~/D03_FLNT_AIS_surveyPts_20180125.csv",
                           stringsAsFactors = F,
                           encoding = "UTF-8")
 
+# #Download data from API and store somewhere
+# dataFromAPI <- neonUtilities::zipsByProduct(streamMorphoDPID,siteID,startdate="2017-01", enddate="2017-12",package="expanded",check.size=FALSE,savepath = filepath)
+# neonUtilities::stackByTable(filepath=paste(filepath,"filesToStack00131",sep = "/"), folder = TRUE)
+# neonUtilities::zipsByURI(filepath=URIpath, savepath = URIpath, pick.files=FALSE, unzip = TRUE, check.size = FALSE)
+# #Read in downloaded data
+# surveyPtsDF <- read.table(paste0(URIpath,"/NEON_D01_HOPB_GEOMORPH_20170921_L0_VE/HOPB_surveyPts_20170921.CSV"),
+#                           sep = ",",
+#                           header = TRUE,
+#                           stringsAsFactors = FALSE)
 
 #The end date of the geomorphology survey (YYYYMMDD)
 surveyDate<-'20180125'

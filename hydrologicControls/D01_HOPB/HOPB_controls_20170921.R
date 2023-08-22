@@ -21,6 +21,8 @@
 #     Generic script created
 #   Bobby Hensley (1/15/2020)
 #     Modified for HOPB 2017 survey
+#   Bobby Hensley (8/14/2023)
+#     Modified to be public facing
 ######################################################################################################################## 
 
 #This reads in data using the API and pulls zip files from the ECS buckets
@@ -31,10 +33,10 @@ library(plotly)
 siteID <- "HOPB"
 domainID <- "D01"
 streamMorphoDPID <- "DP4.00131.001"
-filepath <- "N:/Science/AQU/Controls/D01_HOPB_20170921"
+filepath <- getwd()
 URIpath <- paste(filepath,"filesToStack00131","stackedFiles",sep = "/")
 
-# #Download data from API and store somewhere
+#Download data from API and store somewhere
 dataFromAPI <- neonUtilities::zipsByProduct(streamMorphoDPID,siteID,startdate="2017-01", enddate="2017-12",package="expanded",check.size=FALSE,savepath = filepath)
 neonUtilities::stackByTable(filepath=paste(filepath,"filesToStack00131",sep = "/"), folder = TRUE)
 neonUtilities::zipsByURI(filepath=URIpath, savepath = URIpath, pick.files=FALSE, unzip = TRUE, check.size = FALSE)
@@ -124,9 +126,9 @@ plot_ly(data=dischargePointsXS1,x=~DistanceAdj, y=~gaugeHeight, name='Distance v
   add_trace(y= 0,name = 'Gauge Height = 0.00m',mode='lines',line = list(color = 'red', width = 2, dash='dash')) %>%
   layout(title = siteID, xaxis=xAxisTitle2, yaxis=yAxisTitle2)
 
-#####################################################################################################################################################
-#Adjusts the cross section elevations so lowest point is equal to 0.00 meter mark of staff gauge
-#####################################################################################################################################################
+#Adjusts the cross section so lowest point is equal to 0.00 m mark of staff gauge.
+#This may be necessary because DSC transects may not be exactly at gage, and
+#was recommended by BaM developers to avoid possible negative activation.
 #Determines the lowest elevation of the discharge cross-section
 dischargeXSmin<-min(dischargePointsXS1$H)
 
@@ -147,7 +149,6 @@ font<-list(size=12,color='black')
 plot_ly(data=dischargePointsXS1,x=~DistanceAdj, y=~gaugeHeight, name='Distance vs. Gauge Height', type='scatter', mode='markers+lines', text=~name)%>%
   add_trace(y= 0,name = 'Gauge Height = 0.00m',mode='lines',line = list(color = 'red', width = 2, dash='dash')) %>%
   layout(title = siteID, xaxis=xAxisTitle2, yaxis=yAxisTitle2)
-#####################################################################################################################################################
 
 ##### Now create the actual controls to upload... #####
 

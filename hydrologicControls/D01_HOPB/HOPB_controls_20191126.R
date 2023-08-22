@@ -21,6 +21,8 @@
 #     Generic script created
 #   Bobby Hensley (5/22/2020)
 #     Modified for HOPB 2019 survey
+#   Bobby Hensley (8/14/2023)
+#     Modified to be public facing
 ######################################################################################################################## 
 
 #This reads in data using the API and pulls zip files from the ECS buckets
@@ -31,7 +33,7 @@ library(plotly)
 siteID <- "HOPB"
 domainID <- "D01"
 streamMorphoDPID <- "DP4.00131.001"
-filepath <- "N:/Science/AQU/Controls/D01_HOPB_20191126"
+filepath <- getwd()
 URIpath <- paste(filepath,"filesToStack00131","stackedFiles",sep = "/")
 
 # #Download data from CERT using restR
