@@ -32,18 +32,24 @@ siteID <- "SYCA"
 domainID <- "D14"
 streamMorphoDPID <- "DP4.00131.001"
 filepath <- "N:/Science/AQU/Controls/D14_SYCA_20220315"
+URIpath <- paste(filepath,"filesToStack00131","stackedFiles",sep = "/")
 
-surveyPtsDF <- read.table("~/D14_SYCA_surveyPts_20220315.csv",
+# #Download data from API and store somewhere
+# dataFromAPI <- neonUtilities::zipsByProduct(streamMorphoDPID,siteID,package="expanded",check.size=FALSE,savepath = filepath)
+# neonUtilities::stackByTable(filepath=paste(filepath,"filesToStack00131",sep = "/"), folder = TRUE)
+# neonUtilities::zipsByURI(filepath=URIpath, savepath = URIpath, pick.files=FALSE, unzip = TRUE, check.size = FALSE)
+
+#Read in downloaded data
+surveyPtsDF <- read.table(paste0(URIpath,"/D14_SYCA_surveyPts_20220315.csv"),
                           sep = ",",
-                          header = T,
-                          stringsAsFactors = F,
-                          encoding = "UTF-8")
+                          header = TRUE,
+                          stringsAsFactors = FALSE)
 
 #The end date of the geomorphology survey (YYYYMMDD)
 surveyDate<-'20220315' 
 
 #The date when this survey applies to the gauging record
-surveyActiveDate <- "2021-10-01" 
+surveyActiveDate <- "2022-02-03" 
 
 #Stipulate 4-digit site code, underscore, and survey year (ex: HOPB_2017)
 surveyID <- "SYCA_2022" 
