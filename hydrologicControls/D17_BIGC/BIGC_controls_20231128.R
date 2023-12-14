@@ -6,7 +6,7 @@
 #' Nick Harrison \email{nharrison@battelleecology.org} \cr
 
 #' @description This script generates the controls, uncertainties, and priors associated with the creation of a stage-
-#' discharge rating curve for Big Creek for water years 2022-.
+#' discharge rating curve for Big Creek for water years 2023-.
 
 #' @return This script produces three .csv files:
 #' 'geo_controlInfo_in' contains information on the number of controls and their activations
@@ -19,8 +19,8 @@
 # changelog and author contributions / copyrights
 #   Kaelin Cawley and Nick Harrison (2019)
 #     Generic script created
-#   Bobby Hensley (3/20/2023)
-#     Modified for BIGC 2022 survey
+#   Bobby Hensley (12/31/2023)
+#     Modified for BIGC 2023 survey
 ######################################################################################################################## 
 
 #This reads in data using the API and pulls zip files from the ECS buckets
@@ -31,26 +31,25 @@ library(plotly)
 siteID <- "BIGC"
 domainID <- "D17"
 streamMorphoDPID <- "DP4.00131.001"
-filepath <- "N:/Science/AQU/Controls/D17_BIGC_20220126"
+filepath <- "N:/Science/AQU/Controls/D17_BIGC_20231128"
 URIpath <- paste(filepath,"filesToStack00131","stackedFiles",sep = "/")
 
-surveyPtsDF <- read.table(paste0(URIpath,"/NEON_D17_BIGC_20220126_AIS_SURVEY_L0_VA/D17_BIGC_surveyPts_20220126.CSV"),
+surveyPtsDF <- read.table(paste0(URIpath,"/NEON_D17_BIGC_20231128_AIS_SURVEY_L0_VA/D17_BIGC_surveyPts_20231128.CSV"),
                           sep = ",",
                           header = TRUE,
                           stringsAsFactors = FALSE)
 
 
 #The end date of the geomorphology survey (YYYYMMDD)
-surveyDate<-'20220126' 
+surveyDate<-'20231128' 
 
 #The date when this survey applies to the gauging record
-surveyActiveDate <- "2021-10-01" 
+surveyActiveDate <- "2022-10-01" 
 
 #Stipulate 4-digit site code, underscore, and survey year (ex: HOPB_2017)
-surveyID <- "BIGC_2022" 
+surveyID <- "BIGC_2023" 
 
 #Creates dataframe of all points associated with transect DSC.
-names(surveyPtsDF) <- c("name","E","N","H","mapCode")
 dischargePointsXS1<-subset(surveyPtsDF,mapCode=="Transect_DSC")
 dischargePointsXS1<-dischargePointsXS1[order(dischargePointsXS1$N),]
 rownames(dischargePointsXS1)<-seq(length=nrow(dischargePointsXS1))
@@ -76,7 +75,7 @@ for(i in 1:(length(dischargePointsXS1$name))){
 }
 
 #To manually select ReferenceDistance:
-dischargeXS1ReferenceDistance <- dischargePointsXS1$DistanceRaw[dischargePointsXS1$name=="DSC_LB_PIN_TEMP"]
+dischargeXS1ReferenceDistance <- dischargePointsXS1$DistanceRaw[dischargePointsXS1$name=="DSC_LB_PIN"]
 
 #Sets Horizontal adjustment value based on reference point coordinate.  
 dischargeXS1HorizontalAdjust<-0-dischargeXS1ReferenceDistance
@@ -91,13 +90,13 @@ for(i in 1:(length(dischargePointsXS1$name))){
 #                     (dischargePointsXS1$DistanceAdj[grepl("LBF",dischargePointsXS1$name)]))
 
 #Creates dataframe of staff gauge points
-staffGaugePoints=subset(surveyPtsDF,surveyPtsDF$name=="NEW_SP_0.70M")
+staffGaugePoints=subset(surveyPtsDF,surveyPtsDF$name=="SP_0.60M")
 staffGaugePoints<-staffGaugePoints[order(staffGaugePoints$N),]
 rownames(staffGaugePoints)<-seq(length=nrow(staffGaugePoints))
 
 #Set meter mark where the staff gauge was shot in and the name of the staff gauge point:
 #Recorded in field data
-staffGaugeMeterMark<-0.70
+staffGaugeMeterMark<-0.60
 staffGaugeElevation <- staffGaugePoints$H 
 
 #Converts discharge XS1 transect point elevations to gauge height (rounded to 2 digits).
@@ -214,15 +213,15 @@ geo_controlType_in$rectangularWidthUnc[1] <- 1.0 #Combined uncertainty associate
 
 #Entries for Control #2
 geo_controlType_in$hydraulicControlType[2] <- "Rectangular Channel"
-geo_controlType_in$controlLeft[2] <- dischargePointsXS1$DistanceAdj[dischargePointsXS1$name == "DSC_LBF"]
-geo_controlType_in$controlRight[2] <- dischargePointsXS1$DistanceAdj[dischargePointsXS1$name == "DSC_RBF"]
+geo_controlType_in$controlLeft[2] <- dischargePointsXS1$DistanceAdj[dischargePointsXS1$name == "DSC_LEW"]
+geo_controlType_in$controlRight[2] <- dischargePointsXS1$DistanceAdj[dischargePointsXS1$name == "DSC_REW"]
 geo_controlType_in$rectangularWidth[2] <- geo_controlType_in$controlRight[2]-geo_controlType_in$controlLeft[2]
 geo_controlType_in$rectangularWidthUnc[2] <- 1.0 #Combined uncertainty associated with survey and where actual control begins (1.0 m default)
 
 #Entries for Control #3
 geo_controlType_in$hydraulicControlType[3] <- "Rectangular Channel"
-geo_controlType_in$controlLeft[3] <- dischargePointsXS1$DistanceAdj[dischargePointsXS1$name == "DSC_RBF"]
-geo_controlType_in$controlRight[3] <- dischargePointsXS1$DistanceAdj[dischargePointsXS1$name == "DSC_XS29"]
+geo_controlType_in$controlLeft[3] <- dischargePointsXS1$DistanceAdj[dischargePointsXS1$name == "DSC_XS"]
+geo_controlType_in$controlRight[3] <- dischargePointsXS1$DistanceAdj[dischargePointsXS1$name == "DSC_LEW"]
 geo_controlType_in$rectangularWidth[3] <- geo_controlType_in$controlRight[3]-geo_controlType_in$controlLeft[3]
 geo_controlType_in$rectangularWidthUnc[3] <- 1.0 #Combined uncertainty associated with survey and where actual control begins (1.0 m default)
 
@@ -258,14 +257,14 @@ names(geo_priorParameters_in) <- c("locationID",
                                    "priorActivationStageUnc")
 
 #Manually enter activation stages for controls
-geo_priorParameters_in$priorActivationStage[1] <- dischargePointsXS1$gaugeHeight[dischargePointsXS1$name == "DSC_XS18"]
+geo_priorParameters_in$priorActivationStage[1] <- dischargePointsXS1$gaugeHeight[dischargePointsXS1$name == "DSC_XS3"]
 geo_priorParameters_in$priorActivationStageUnc[1] <- 0.1
 
-geo_priorParameters_in$priorActivationStage[2] <- dischargePointsXS1$gaugeHeight[dischargePointsXS1$name == "DSC_XS20"]
-geo_priorParameters_in$priorActivationStageUnc[2] <- 0.1
+geo_priorParameters_in$priorActivationStage[2] <- dischargePointsXS1$gaugeHeight[dischargePointsXS1$name == "DSC_XS2"]
+geo_priorParameters_in$priorActivationStageUnc[2] <- 0.2 #Used more uncertainty because there's not a lot of shots in transect
 
-geo_priorParameters_in$priorActivationStage[3] <- dischargePointsXS1$gaugeHeight[dischargePointsXS1$name == "DSC_RBF"]
-geo_priorParameters_in$priorActivationStageUnc[3] <- 0.1
+geo_priorParameters_in$priorActivationStage[3] <- dischargePointsXS1$gaugeHeight[dischargePointsXS1$name == "DSC_LB_PIN"]
+geo_priorParameters_in$priorActivationStageUnc[3] <- 0.2 #Used more uncertainty because there's not a lot of shots in transect
 
 geo_priorParameters_in$locationID <- siteID
 geo_priorParameters_in$startDate <- surveyActiveDate

@@ -54,6 +54,11 @@ dischargePointsXS1<-subset(surveyPtsDF,mapCode=="Transect_DSC")
 dischargePointsXS1<-dischargePointsXS1[order(dischargePointsXS1$N),]
 rownames(dischargePointsXS1)<-seq(length=nrow(dischargePointsXS1))
 
+#Add bank point to cross section
+bankPoint1 <- data.frame("DSC_BANK1",1248,-820,996,"Transect_DSC")
+names(bankPoint1)<-names(dischargePointsXS1)
+dischargePointsXS1<-rbind(dischargePointsXS1,bankPoint1)
+
 #Sets plot1 settings.  
 xAxisTitle1<-list(title="Easting (m)",zeroline=FALSE)
 yAxisTitle1<-list(title="Northing  (m)",zeroline=FALSE)
@@ -61,6 +66,7 @@ font<-list(size=12,color='black')
 
 #Plot the cross section by easting and northing data for a sanity check
 plot_ly(data=dischargePointsXS1,x=~E, y=~N, name='Easting vs Northing', type='scatter', mode='markers', text=~name)%>%
+  add_trace(data=surveyPtsDF,x=~E,y=~N)
   layout(title = siteID, xaxis=xAxisTitle1, yaxis=yAxisTitle1)
 
 #Manually select NorthStart and EastStart coordinates
@@ -109,7 +115,7 @@ dischargePointsXS1$ID<-c(1:length(dischargePointsXS1$name))
 dischargePointsXS1 <- dischargePointsXS1[order(dischargePointsXS1$DistanceAdj),]
 
 #Sets plot2 settings.  
-xAxisTitle2<-list(title="Distance (m)",zeroline=FALSE, range=c(-20,5))
+xAxisTitle2<-list(title="Distance (m)",zeroline=FALSE, range=c(-5,35))
 yAxisTitle2<-list(title="Gauge Height  (m)",zeroline=FALSE)
 font<-list(size=12,color='black')
 
@@ -121,26 +127,26 @@ plot_ly(data=dischargePointsXS1,x=~DistanceAdj, y=~gaugeHeight, name='Distance v
 #####################################################################################################################################################
 #Adjusts the cross section elevations so lowest point is equal to 0.00 meter mark of staff gauge
 #####################################################################################################################################################
-#Determines the lowest elevation of the discharge cross-section
-dischargeXSmin<-min(dischargePointsXS1$H)
-
-#Determines elevation of 0.00 meter mark of staff gage
-staffGaugeZero=staffGaugeElevation-staffGaugeMeterMark
-
-#Determines the offset between the lowest elevation and gauge height 
-ElevOff<-dischargeXSmin-staffGaugeZero
-
-#Adjusts the cross section elevations by the offset and rounds to 2 decimals
-dischargePointsXS1$gaugeHeight<-dischargePointsXS1$gaugeHeight - ElevOff
-dischargePointsXS1$gaugeHeight<-round(dischargePointsXS1$gaugeHeight,digits=2)
-
-#Replots the adjusted cross section  
-xAxisTitle2<-list(title="Distance (m)",zeroline=FALSE, range=c(-4,16))
-yAxisTitle2<-list(title="Gauge Height  (m)",zeroline=FALSE)
-font<-list(size=12,color='black')
-plot_ly(data=dischargePointsXS1,x=~DistanceAdj, y=~gaugeHeight, name='Distance vs. Gauge Height', type='scatter', mode='markers+lines', text=~name)%>%
-  add_trace(y= 0,name = 'Gauge Height = 0.00m',mode='lines',line = list(color = 'red', width = 2, dash='dash')) %>%
-  layout(title = siteID, xaxis=xAxisTitle2, yaxis=yAxisTitle2)
+# #Determines the lowest elevation of the discharge cross-section
+# dischargeXSmin<-min(dischargePointsXS1$H)
+# 
+# #Determines elevation of 0.00 meter mark of staff gage
+# staffGaugeZero=staffGaugeElevation-staffGaugeMeterMark
+# 
+# #Determines the offset between the lowest elevation and gauge height 
+# ElevOff<-dischargeXSmin-staffGaugeZero
+# 
+# #Adjusts the cross section elevations by the offset and rounds to 2 decimals
+# dischargePointsXS1$gaugeHeight<-dischargePointsXS1$gaugeHeight - ElevOff
+# dischargePointsXS1$gaugeHeight<-round(dischargePointsXS1$gaugeHeight,digits=2)
+# 
+# #Replots the adjusted cross section  
+# xAxisTitle2<-list(title="Distance (m)",zeroline=FALSE, range=c(-4,36))
+# yAxisTitle2<-list(title="Gauge Height  (m)",zeroline=FALSE)
+# font<-list(size=12,color='black')
+# plot_ly(data=dischargePointsXS1,x=~DistanceAdj, y=~gaugeHeight, name='Distance vs. Gauge Height', type='scatter', mode='markers+lines', text=~name)%>%
+#   add_trace(y= 0,name = 'Gauge Height = 0.00m',mode='lines',line = list(color = 'red', width = 2, dash='dash')) %>%
+#   layout(title = siteID, xaxis=xAxisTitle2, yaxis=yAxisTitle2)
 #####################################################################################################################################################
 
 ##### Now create the actual controls to upload... #####
@@ -221,7 +227,7 @@ geo_controlType_in$rectangularWidthUnc[2] <- 1.0 #Combined uncertainty associate
 #Entries for Control #3
 geo_controlType_in$hydraulicControlType[3] <- "Rectangular Channel"
 geo_controlType_in$controlLeft[3] <- dischargePointsXS1$DistanceAdj[dischargePointsXS1$name == "IN_DSC_RBF"]
-geo_controlType_in$controlRight[3] <- dischargePointsXS1$DistanceAdj[dischargePointsXS1$name == "IN_DSC_XS_27"]
+geo_controlType_in$controlRight[3] <- dischargePointsXS1$DistanceAdj[dischargePointsXS1$name == "DSC_BANK1"]
 geo_controlType_in$rectangularWidth[3] <- geo_controlType_in$controlRight[3]-geo_controlType_in$controlLeft[3]
 geo_controlType_in$rectangularWidthUnc[3] <- 1.0 #Combined uncertainty associated with survey and where actual control begins (1.0 m default)
 
