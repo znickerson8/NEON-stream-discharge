@@ -244,6 +244,8 @@ csTwo=c(1,3)
 
 rise <- abs(mean(wettedEdgePoints$H[csOne])-mean(wettedEdgePoints$H[csTwo]))
 run <- sqrt((mean(wettedEdgePoints$E[csOne])-mean(wettedEdgePoints$E[csTwo]))**2+(mean(wettedEdgePoints$N[csOne])-mean(wettedEdgePoints$N[csTwo]))**2)
+geo_controlType_in$channelSlope[1] <- rise/run
+geo_controlType_in$channelSlopeUnc[1] <- 0.004  #Default slope uncertainty is equal to slope
 geo_controlType_in$channelSlope[2] <- rise/run
 geo_controlType_in$channelSlopeUnc[2] <- 0.004  #Default slope uncertainty is equal to slope
 geo_controlType_in$channelSlope[3] <- rise/run
