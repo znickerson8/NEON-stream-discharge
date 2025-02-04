@@ -1,12 +1,12 @@
 ######################################################################################################################## 
-#' @title Stage-Discharge Rating Curve Controls Script - D18 - OKSR
+#' @title Stage-Discharge Rating Curve Controls Script - D02 - LEWI
 
 #' @author Bobby Hensley \email{hensley@battelleecology.org} \cr 
 #' Kaelin M. Cawley \email{kcawley@battelleecology.org} \cr
 #' Nick Harrison \email{nharrison@battelleecology.org} \cr
 
 #' @description This script generates the controls, uncertainties, and priors associated with the creation of a stage-
-#' discharge rating curve for Oksrukuyik Creek for water years 2024-
+#' discharge rating curve for Lewis Run for water years 2012-
 
 #' @return This script produces three .csv files:
 #' 'geo_controlInfo_in' contains information on the number of controls and their activations
@@ -19,9 +19,9 @@
 # changelog and author contributions / copyrights
 #   Kaelin Cawley and Nick Harrison (2019-08-01)
 #     Generic script created.
-#   Bobby Hensley (2024-07-01)
-#     Script for OKSR 2024-08-13 created.
-#   Bobby Hensley (2024-12-23)
+#   Bobby Hensley (2020-02-03)
+#     Script for LEWI 2019-02-05 created.
+#   Bobby Hensley (2025-01-25)
 #     Modified script to be public facing.
 ######################################################################################################################## 
 ############################################ Format the survey points file ############################################
@@ -29,24 +29,24 @@
 library(neonUtilities)
 library(plotly)
 
-siteID <- "OKSR"
-domainID <- "D18"
+siteID <- "LEWI"
+domainID <- "D02"
 streamMorphoDPID <- "DP4.00131.001"
 filepath <- getwd()
 
 #' Read in geomorph data including survey points file from NEON API 
-dataFromAPI <- neonUtilities::loadByProduct(streamMorphoDPID,siteID,startdate="2024-08", enddate="2024-08",
+dataFromAPI <- neonUtilities::loadByProduct(streamMorphoDPID,siteID,startdate="2019-02", enddate="2019-02",
               package="expanded",release="current",include.provisional=TRUE,check.size=FALSE)
 list2env(dataFromAPI,.GlobalEnv)
 
 #' Specify end date of the geomorphology survey (YYYY-MM-DD)
-surveyDate<-'2024-08-01' 
+surveyDate<-'2019-02-05' 
 
 #' Specify date when survey become active (YYYY-MM-DD. Default is start of water year)
-surveyActiveDate <- "2024-01-01"
+surveyActiveDate <- "2012-10-01"
 
 #' Specify survey ID (4-digit site code, underscore, and survey year. ex: HOPB_2017)
-surveyID <- "OKSR_2024" 
+surveyID <- "LEWI_2019" 
 
 #' Create dataframe of processed survey points associated with DSC transect for geomorph surveys
 if(geo_surveySummary$surveyBoutTypeID=="geomorphology"){
@@ -68,7 +68,7 @@ plot_ly(data=dsc_surveyPoints,x=~easting, y=~northing, name='DSC Plan View', typ
   layout(title = siteID, xaxis=list(title="Easting (m)",zeroline=FALSE), yaxis=list(title="Northing (m)",zeroline=FALSE))
 
 #' Manually identify the left-most survey point in the DSC transect
-dscStart<-"DSC_LBF"
+dscStart<-"DSC_LB_PIN"
 
 #' Assigns a raw distance value to each point relative to the left-most survey point in the DSC transect.
 for(i in 1:(length(dsc_surveyPoints$surveyPointID))){
@@ -93,17 +93,20 @@ if(geo_surveySummary$surveyBoutTypeID=="AIS survey"){
   staffGaugePoints$elevation<-staffGaugePoints$relativeHeight}
 
 #' Manually identify staff gauge point to use (some surveys may have multiple)
-staffGaugeElevation <- staffGaugePoints$elevation[grepl("SP.0.50M",staffGaugePoints$surveyPointID)]  
+staffGaugeElevation <- staffGaugePoints$elevation[grepl("SP_0.55M",staffGaugePoints$surveyPointID)]  
 
 #' Manually enter the staff gauge reading of the point used above (found in surveyPointID name)
-staffGaugeMeterMark<-0.50
+staffGaugeMeterMark<-0.55
 
 #' Converts elevations of survey points in DSC transect to gauge height (rounded to 2 digits).
 dsc_surveyPoints$gaugeHeight<-round(dsc_surveyPoints$elevation - (staffGaugeElevation - staffGaugeMeterMark),digits=2)
 
+#' Adjusts the cross section elevations so lowest point is equal to 0.00 meter mark of staff gauge
+ElevOff<-min(dsc_surveyPoints$elevation)-(staffGaugeElevation-staffGaugeMeterMark) #Determines the offset between the lowest elevation and elevation of 0.0 on staff gage 
+dsc_surveyPoints$gaugeHeight<-round(dsc_surveyPoints$gaugeHeight - ElevOff,digits=2) #Adjusts the cross section elevations by the offset
+
 #' Assigns a unique to each measurement for plot viewing purposes.  
 dsc_surveyPoints$ID<-c(1:length(dsc_surveyPoints$name))
-
 
 #' Plot the cross section by distance and gauge height.  
 plot_ly(data=dsc_surveyPoints,x=~distanceAdj, y=~gaugeHeight, name='DSC Cross-section View', type='scatter', mode='markers+lines', text=~surveyPointID)%>%
@@ -119,7 +122,7 @@ geo_dsc_distAdj_gaugHeight<-dsc_surveyPoints[,c("siteID","surveyEndDate","survey
 ####################################### Now create the BaM control input tables #######################################
 
 #' Specify the number of controls (Most common will be 3)
-numControls <- 3
+numControls <- 2
 
 
 #' Generate "geo_controlInfo_in" Table
@@ -135,11 +138,7 @@ geo_controlInfo_in$segmentNumber <- rep(1:numControls,numControls)
 geo_controlInfo_in$controlActivationState[geo_controlInfo_in$controlNumber==geo_controlInfo_in$segmentNumber] <- 1
 geo_controlInfo_in$controlActivationState[geo_controlInfo_in$controlNumber>geo_controlInfo_in$segmentNumber] <- 0
 #' Is control #1 still active when control #2 is activated (0 = No, 1 = Yes)?
-geo_controlInfo_in$controlActivationState[geo_controlInfo_in$controlNumber==1&geo_controlInfo_in$segmentNumber==2] <- 0
-#' Is control #1 still active when control #3 is activated (0 = No, 1 = Yes)?
-geo_controlInfo_in$controlActivationState[geo_controlInfo_in$controlNumber==1&geo_controlInfo_in$segmentNumber==3] <- 0
-#' Is control #2 still active when control #3 is activated (0 = No, 1 = Yes)?
-geo_controlInfo_in$controlActivationState[geo_controlInfo_in$controlNumber==2&geo_controlInfo_in$segmentNumber==3] <- 1
+geo_controlInfo_in$controlActivationState[geo_controlInfo_in$controlNumber==1&geo_controlInfo_in$segmentNumber==2] <- 1
 
 
 #' Generate "geo_controlType_in" Table
@@ -156,39 +155,60 @@ geo_controlType_in$controlNumber <- 1:numControls
 
 #' Manually identify left and right start points of each control.
 #' In most cases NEON uses a default of 1.0m for the control width uncertainty 
-geo_controlType_in$hydraulicControlType[1] <- "Rectangular Weir"
-geo_controlType_in$controlLeft[1] <- dsc_surveyPoints$distanceAdj[dsc_surveyPoints$surveyPointID == "DSC_5"]
-geo_controlType_in$controlRight[1] <- dsc_surveyPoints$distanceAdj[dsc_surveyPoints$surveyPointID == "DSC_15"]
+geo_controlType_in$hydraulicControlType[1] <- "Rectangular Channel"
+geo_controlType_in$controlLeft[1] <- dsc_surveyPoints$distanceAdj[dsc_surveyPoints$surveyPointID == "DSC_LFW"]
+geo_controlType_in$controlRight[1] <- dsc_surveyPoints$distanceAdj[dsc_surveyPoints$surveyPointID == "DSC_XS33"]
 geo_controlType_in$rectangularWidth[1] <- geo_controlType_in$controlRight[1]-geo_controlType_in$controlLeft[1]
 geo_controlType_in$rectangularWidthUnc[1] <- 1.0 
 geo_controlType_in$hydraulicControlType[2] <- "Rectangular Channel"
-geo_controlType_in$controlLeft[2] <- dsc_surveyPoints$distanceAdj[dsc_surveyPoints$surveyPointID == "DSC_LEW"]
-geo_controlType_in$controlRight[2] <- dsc_surveyPoints$distanceAdj[dsc_surveyPoints$surveyPointID == "DSC_REW"]
+geo_controlType_in$controlLeft[2] <- dsc_surveyPoints$distanceAdj[dsc_surveyPoints$surveyPointID == "DSC_XS33"]
+geo_controlType_in$controlRight[2] <- dsc_surveyPoints$distanceAdj[dsc_surveyPoints$surveyPointID == "DSC_RBF"]
 geo_controlType_in$rectangularWidth[2] <- geo_controlType_in$controlRight[2]-geo_controlType_in$controlLeft[2]
 geo_controlType_in$rectangularWidthUnc[2] <- 1.0 
-geo_controlType_in$hydraulicControlType[3] <- "Rectangular Channel"
-geo_controlType_in$controlLeft[3] <- dsc_surveyPoints$distanceAdj[dsc_surveyPoints$surveyPointID == "DSC_LBF"]
-geo_controlType_in$controlRight[3] <- dsc_surveyPoints$distanceAdj[dsc_surveyPoints$surveyPointID == "DSC_LEW"]
-geo_controlType_in$rectangularWidth[3] <- geo_controlType_in$controlRight[3]-geo_controlType_in$controlLeft[3]
-geo_controlType_in$rectangularWidthUnc[3] <- 1.0 
 
-# #Slope calculations
-geo_controlType_in$channelSlope[2] <- 0.02 #Used slope from 2019 survey
+#Slope calculations
+colfunc <- colorRampPalette(c("cyan","deeppink"))
+wettedEdgePoints=subset(geo_processedSurveyData,geo_processedSurveyData$mapCode%in%c("Left edge water","Right edge water"))
+wettedEdgePoints<-wettedEdgePoints[order(wettedEdgePoints$decimalLatitude),]
+rownames(wettedEdgePoints)<-seq(length=nrow(wettedEdgePoints)) 
+# invisible(dev.new(noRStudioGD = TRUE))
+# plot(wettedEdgePoints$easting,wettedEdgePoints$northing,pch=19, col=colfunc(length(wettedEdgePoints$elevation))[order(wettedEdgePoints$elevation)],
+#      main=paste(siteID,"\nSelect a point above and below the discharge cross-section"),xlab="Easting",ylab="Northing")
+# legend(min(wettedEdgePoints$easting),max(wettedEdgePoints$northing),legend=c("highest elevation","lowest elevation","discharge cross-section"),col = c("deeppink","cyan","green"),bty="n",pch = c(19,19,1))
+# points(dsc_surveyPoints$easting,dsc_surveyPoints$northing, col="green")
+# ans <- identify(wettedEdgePoints$easting,wettedEdgePoints$northing, n = 2, pos = F, tolerance = 0.25)
+# Sys.sleep(1)
+# invisible(dev.off())
+
+ans=c(252,319)
+
+#Plot subsetted wetted edges by manually entering ans values for tracking
+wettedEdgePoints <- wettedEdgePoints[ans[1]:ans[2],]
+# invisible(dev.new(noRStudioGD = TRUE))
+# plot(wettedEdgePoints$easting,wettedEdgePoints$northing,pch=19, col=colfunc(length(wettedEdgePoints$elevation))[order(wettedEdgePoints$elevation)],
+#      main=paste(siteID,"\nSelect two points above and below the discharge cross-section"),xlab="Raw Easting",ylab="Raw Northing")
+# legend(min(wettedEdgePoints$easting),max(wettedEdgePoints$northing),legend=c("highest elevation","lowest elevation","discharge cross-section"),col = c("deeppink","cyan","green"),bty="n",pch = c(19,19,1))
+# points(dsc_surveyPoints$easting,dsc_surveyPoints$northing, col="green")
+# csOne <- identify(wettedEdgePoints$easting,wettedEdgePoints$northing, n = 2, pos = F, tolerance = 0.1)
+# csTwo <- identify(wettedEdgePoints$easting,wettedEdgePoints$northing, n = 2, pos = F, tolerance = 0.1)
+# Sys.sleep(1)
+# invisible(dev.off())
+
+csOne=c(9,7)
+csTwo=c(54,56)
+
+rise <- abs(mean(wettedEdgePoints$elevation[csOne])-mean(wettedEdgePoints$elevation[csTwo]))
+run <- sqrt((mean(wettedEdgePoints$easting[csOne])-mean(wettedEdgePoints$easting[csTwo]))**2+(mean(wettedEdgePoints$northing[csOne])-mean(wettedEdgePoints$northing[csTwo]))**2)
+geo_controlType_in$channelSlope[2] <- rise/run
 geo_controlType_in$channelSlopeUnc[2] <- 0.02 #Default slope uncertainty is equal to slope
-geo_controlType_in$channelSlope[3] <- 0.02 #Slope really low. Used slope from 2019 survey
-geo_controlType_in$channelSlopeUnc[3] <- 0.02 #Default slope uncertainty is equal to slope
 
 #' Specify Manning coefficient and uncertainty
-geo_controlType_in$manningCoefficient[2] <- 0.05
-geo_controlType_in$manningCoefficientUnc[2] <- 0.025
-geo_controlType_in$manningCoefficient[3] <- 0.05
-geo_controlType_in$manningCoefficientUnc[3] <- 0.025
+geo_controlType_in$manningCoefficient[2] <- 0.05 # Cobble stream with some pools 
+geo_controlType_in$manningCoefficientUnc[2] <- 0.025 # Default Mannings uncertainty equal 50%
 
 #' Calculates Strickler coefficient and uncertainty
 geo_controlType_in$stricklerCoefficient[2] <- 1/geo_controlType_in$manningCoefficient[2]
 geo_controlType_in$stricklerCoefficientUnc[2] <- geo_controlType_in$stricklerCoefficient[2]*(geo_controlType_in$manningCoefficientUnc[2]/geo_controlType_in$manningCoefficient[2])
-geo_controlType_in$stricklerCoefficient[3] <- 1/geo_controlType_in$manningCoefficient[3]
-geo_controlType_in$stricklerCoefficientUnc[3] <- geo_controlType_in$stricklerCoefficient[3]*(geo_controlType_in$manningCoefficientUnc[3]/geo_controlType_in$manningCoefficient[3])
 
 #' Generate "geo_priorParameters_in" Table
 geo_priorParameters_in <- data.frame(matrix(nrow = numControls, ncol = 10))
@@ -197,12 +217,10 @@ names(geo_priorParameters_in) <- c("locationID","startDate","endDate","controlNu
 
 #' Manually identify activation stage for each control
 #' In most cases NEON uses a default of 0.1m for the activation stage uncertainty 
-geo_priorParameters_in$priorActivationStage[1] <- dsc_surveyPoints$gaugeHeight[dsc_surveyPoints$surveyPointID == "DSC_10"]
+geo_priorParameters_in$priorActivationStage[1] <- dsc_surveyPoints$gaugeHeight[dsc_surveyPoints$surveyPointID == "DSC_XS19"]
 geo_priorParameters_in$priorActivationStageUnc[1] <- 0.1
-geo_priorParameters_in$priorActivationStage[2] <- dsc_surveyPoints$gaugeHeight[dsc_surveyPoints$surveyPointID == "DSC_14"]
+geo_priorParameters_in$priorActivationStage[2] <- dsc_surveyPoints$gaugeHeight[dsc_surveyPoints$surveyPointID == "DSC_XS43"]
 geo_priorParameters_in$priorActivationStageUnc[2] <- 0.1 
-geo_priorParameters_in$priorActivationStage[3] <- dsc_surveyPoints$gaugeHeight[dsc_surveyPoints$surveyPointID == "DSC_2"]
-geo_priorParameters_in$priorActivationStageUnc[3] <- 0.1 
 geo_priorParameters_in$locationID <- siteID
 geo_priorParameters_in$startDate <- surveyActiveDate
 geo_priorParameters_in$endDate <- surveyActiveDate
