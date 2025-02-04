@@ -46,7 +46,7 @@ surveyDate<-'20220303'
 surveyActiveDate <- "2021-10-01" 
 
 #Stipulate 4-digit site code, underscore, and survey year (ex: HOPB_2017)
-surveyID <- "SYCA_2022" 
+surveyID <- "ARIK_2022" 
 
 #Creates dataframe of all points associated with transect DSC.
 #names(surveyPtsDF) <- c("name","latitude","longitude","easting","northing","elevationM","mapCode","E","N","H","onlyDigits")

@@ -176,7 +176,7 @@ geo_controlType_in$rectangularWidth[3] <- geo_controlType_in$controlRight[3]-geo
 geo_controlType_in$rectangularWidthUnc[3] <- 1.0 
 
 #Slope calculations
-#No wetted edge or thalweg shots in survey. Used slope from previous survey.
+#No wetted edge or thalweg shots in AIS survey. Used slope from previous geomorph survey.
 geo_controlType_in$channelSlope[2] <- 0.03
 geo_controlType_in$channelSlopeUnc[2] <- 0.03 #Default slope uncertainty is equal to slope
 geo_controlType_in$channelSlope[3] <- 0.03
