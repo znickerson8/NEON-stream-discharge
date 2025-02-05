@@ -8,10 +8,11 @@
 #' @description This script generates the controls, uncertainties, and priors associated with the creation of a stage-
 #' discharge rating curve for LeConte Creek for water years 2021-
 
-#' @return This script produces three .csv files:
-#' 'geo_controlInfo_in' contains information on the number of controls and their activations
-#' 'geo_controlType_in' Defines the control type and reports parameters and uncertainties for each control
-#' 'geo_priorParameters_in' reports the priors calculated in this script
+#' @return This script produces four .csv files:
+#' 'geo_controlInfo_in' contains control activation states
+#' 'geo_controlType_in' contains the control types, their properties and their uncertainties 
+#' 'geo_priorParameters_in' contains the model priors and their uncertainties
+#' 'geo_dsc_distAdj_gaugHeight' contains the cross-section of the discharge transect
 
 #' @references 
 #' License: GNU AFFERO GENERAL PUBLIC LICENSE Version 3, 19 November 2007
