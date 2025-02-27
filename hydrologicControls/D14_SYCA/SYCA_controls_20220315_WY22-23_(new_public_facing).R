@@ -6,7 +6,7 @@
 #' Nick Harrison \email{nharrison@battelleecology.org} \cr
 
 #' @description This script generates the controls, uncertainties, and priors associated with the creation of a stage-
-#' discharge rating curve for Sycamore Creek for water years 2022-
+#' discharge rating curve for Sycamore Creek for water years 2022-23
 
 #' @return This script produces four .csv files:
 #' 'geo_controlInfo_in' contains control activation states
