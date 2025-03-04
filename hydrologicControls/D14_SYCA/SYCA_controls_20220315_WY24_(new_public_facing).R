@@ -26,6 +26,8 @@
 #     Modified script to be public facing.
 #   Bobby Hensley (2025-02-27)
 #     Modified to have different controls from same survey for WY24
+#   Bobby Hensley (2025-03-03)
+#     Added 0.2m shift to gage height to better fit observed point of zero flow (lines 110-111)
 ######################################################################################################################## 
 ############################################ Format the survey points file ############################################
 
@@ -43,7 +45,7 @@ dataFromAPI <- neonUtilities::loadByProduct(streamMorphoDPID,siteID,startdate="2
 list2env(dataFromAPI,.GlobalEnv)
 
 #' Specify end date of the geomorphology survey (YYYY-MM-DD)
-surveyDate<-'2022-03-15' 
+surveyDate<-'2022-03-16' 
 
 #' Specify date when survey become active (YYYY-MM-DD. Default is start of water year)
 surveyActiveDate <- "2023-10-01" 
@@ -104,9 +106,9 @@ staffGaugeMeterMark<-0.65
 #' Converts elevations of survey points in DSC transect to gauge height (rounded to 2 digits).
 dsc_surveyPoints$gaugeHeight<-round(dsc_surveyPoints$elevation - (staffGaugeElevation - staffGaugeMeterMark),digits=2)
 
-#' Adjusts the cross section elevations so lowest point is equal to 0.00 meter mark of staff gauge
-# ElevOff<-min(dsc_surveyPoints$elevation)-(staffGaugeElevation-staffGaugeMeterMark) #Determines the offset between the lowest elevation and elevation of 0.0 on staff gage
-# dsc_surveyPoints$gaugeHeight<-round(dsc_surveyPoints$gaugeHeight - ElevOff,digits=2) #Adjusts the cross section elevations by the offset
+#' Adds a 0.2m shift to the gage heights to better fit the point of zero flow in the gagings. 
+ElevOff<-(-0.2)
+dsc_surveyPoints$gaugeHeight<-round(dsc_surveyPoints$gaugeHeight - ElevOff,digits=2) #Adjusts the cross section elevations by the offset
 
 #' Assigns a unique to each measurement for plot viewing purposes.  
 dsc_surveyPoints$ID<-c(1:length(dsc_surveyPoints$name))
@@ -208,7 +210,7 @@ geo_priorParameters_in$priorActivationStage[1] <- dsc_surveyPoints$gaugeHeight[d
 geo_priorParameters_in$priorActivationStageUnc[1] <- 0.1
 geo_priorParameters_in$priorActivationStage[2] <- dsc_surveyPoints$gaugeHeight[dsc_surveyPoints$surveyPointID == "DSC_XS21"]
 geo_priorParameters_in$priorActivationStageUnc[2] <- 0.1 
-geo_priorParameters_in$priorActivationStage[3] <- dsc_surveyPoints$gaugeHeight[dsc_surveyPoints$surveyPointID == "DSC_XS39"]
+geo_priorParameters_in$priorActivationStage[3] <- dsc_surveyPoints$gaugeHeight[dsc_surveyPoints$surveyPointID == "DSC_XS42"]
 geo_priorParameters_in$priorActivationStageUnc[3] <- 0.1 
 geo_priorParameters_in$locationID <- siteID
 geo_priorParameters_in$startDate <- surveyActiveDate
